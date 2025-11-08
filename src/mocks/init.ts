@@ -14,6 +14,7 @@ async function enableMocking() {
   }
 
   if (isInitialized) {
+    console.log('[MSW] 이미 초기화됨, 스킵')
     return
   }
 
@@ -29,12 +30,12 @@ async function enableMocking() {
   console.log('✅ MSW Mock Service Worker 활성화됨')
 }
 
-// 개발 환경에서만 MSW 활성화
-if (process.env.NODE_ENV === 'development') {
-  enableMocking().catch((error) => {
-    console.error('MSW 초기화 실패:', error)
-  })
-}
+// 모듈 레벨에서 자동 실행하지 않음 (MSWProvider에서만 호출)
+// if (process.env.NODE_ENV === 'development') {
+//   enableMocking().catch((error) => {
+//     console.error('MSW 초기화 실패:', error)
+//   })
+// }
 
 export { enableMocking }
 
