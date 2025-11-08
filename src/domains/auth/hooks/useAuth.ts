@@ -301,6 +301,36 @@ export function useAuth() {
     setError(null)
     setIsLoading(true)
     try {
+      // MSW Mock 환경에서는 API 호출로 처리
+      if (process.env.NODE_ENV === 'development') {
+        const response = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || AUTH_ERROR_MESSAGES.PROFILE_UPDATE_FAILED)
+        }
+        const responseData = await response.json()
+        const updatedUserData: User = {
+          id: responseData.user.id,
+          email: responseData.user.email,
+          nickname: responseData.user.nickname,
+          profileImage: responseData.user.profileImage,
+        }
+        setUser(updatedUserData)
+        return updatedUserData
+      }
+
+      // 실제 Supabase 환경
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        throw new Error('Supabase client not available')
+      }
+      
       // 중복 닉네임 체크
       if (data.nickname) {
         const { data: existingUser } = await supabase
