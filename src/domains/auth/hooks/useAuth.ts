@@ -28,6 +28,8 @@ const MAX_NICKNAME_LENGTH = 20
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
   const supabase = createClient()
 
   /**
