@@ -213,20 +213,31 @@ QA 검수 시 다음을 포함:
 
 ### Phase 4: 개발 및 테스트 (FE Engineer ↔ FE TEST ↔ QA ↔ PM ↔ TPM ↔ Designer)
 21. PM이 유저 시나리오 작성 (각 기능별)
+    - PM이 유저 시나리오 작성 완료 시 **반드시 Git 커밋 수행**
+    - PM과 다른 페르소나 간의 대화는 `conversations/phase4_dev/pm_*.md`에 저장
 22. FE TEST가 유저 시나리오 분석 및 테스트 시나리오 작성
+    - FE TEST와 PM 간의 대화는 `conversations/phase4_dev/pm_fe_test_*.md`에 저장
 23. FE TEST가 단위 테스트 작성 (RED - 실패하는 테스트)
+    - FE TEST와 FE Engineer 간의 대화는 `conversations/phase4_dev/fe_test_fe_engineer_*.md`에 저장
 24. FE Engineer가 아키텍처 설계 및 컴포넌트 구조 설계
+    - FE Engineer와 TPM, Designer 간의 대화는 각각 별도 파일로 저장
 25. FE Engineer가 기능 개발 시작 (frontend-rules.md 준수)
 26. FE Engineer가 테스트 통과하도록 개발 (GREEN)
 27. FE TEST가 테스트 실행 및 통과 확인
 28. FE Engineer가 리팩토링 (REFACTOR)
 29. FE TEST가 통합 테스트 작성 및 실행
 30. QA가 테스트 검수 및 실제 사용자 관점에서 검증
+    - QA와 FE TEST, FE Engineer 간의 대화는 각각 별도 파일로 저장
 31. QA가 버그 발견 시 FE Engineer에게 리포트
 32. FE Engineer가 버그 수정
 33. QA가 회귀 테스트 수행
 34. 품질 기준 달성 확인
 35. 필요시 반복 (21-34)
+
+**중요 규칙**:
+- **PM이 유저 시나리오 작성 완료 시 반드시 Git 커밋 수행**
+- **모든 페르소나 간의 대화는 별도 파일로 저장** (`conversations/phase4_dev/` 디렉토리)
+- 각 단계 완료 시마다 Git 커밋 수행 권장
 
 ### 파일 저장 규칙
 - 모든 대화는 `conversations/` 디렉토리에 단계별로 저장

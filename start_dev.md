@@ -26,7 +26,13 @@
 - `user_scenarios/feature_*.md` - 기능별 유저 시나리오
 
 **대화 기록**:
-- `conversations/phase4_dev/pm_user_scenarios_*.md`
+- `conversations/phase4_dev/pm_user_scenarios_*.md` - PM의 작업 기록
+- `conversations/phase4_dev/pm_fe_test_*.md` - PM과 FE TEST 간의 대화
+- `conversations/phase4_dev/pm_*.md` - PM과 다른 페르소나 간의 대화
+
+**Git 커밋**:
+- ✅ **PM이 유저 시나리오 작성 완료 시 반드시 Git 커밋 수행**
+- 커밋 메시지 예시: `📝 PM: [기능명] 유저 시나리오 작성 완료`
 
 ---
 
@@ -227,6 +233,7 @@
 - PM이 유저 시나리오 작성
 - FE TEST가 테스트 시나리오로 전환
 - **대화 기록**: `conversations/phase4_dev/pm_fe_test_*.md`
+- **Git 커밋**: PM이 유저 시나리오 작성 완료 시 반드시 커밋
 
 ### FE TEST ↔ FE Engineer
 - FE TEST가 테스트 작성 (RED)
@@ -253,6 +260,8 @@
 - QA가 버그 리포트
 - FE Engineer가 버그 수정
 - **대화 기록**: `conversations/phase4_dev/qa_fe_engineer_*.md`
+
+**중요**: 모든 페르소나 간의 대화는 별도 파일로 저장되어야 합니다.
 
 ---
 
@@ -338,8 +347,12 @@ docs/                      # 개발 문서
 ## 각 단계마다
 
 - **대화 기록을 conversations/phase4_dev/ 디렉토리에 저장**
+  - 각 페르소나 간의 대화는 별도 파일로 저장
+  - 파일명 형식: `[페르소나1]_[페르소나2]_[내용]_*.md`
 - **출력 파일을 적절한 디렉토리에 저장**
 - **변경사항을 Git에 커밋**
+  - ✅ **PM이 유저 시나리오 작성 완료 시 반드시 Git 커밋 수행**
+  - 각 주요 단계 완료 시마다 Git 커밋 권장
 
 ---
 
