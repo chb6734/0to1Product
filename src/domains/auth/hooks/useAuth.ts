@@ -108,7 +108,7 @@ export function useAuth() {
     } finally {
       setIsLoading(false)
     }
-  }, [supabase])
+  }, [getSupabaseClient])
 
   /**
    * Kakao 소셜 로그인
@@ -176,7 +176,7 @@ export function useAuth() {
     } finally {
       setIsLoading(false)
     }
-  }, [supabase])
+  }, [getSupabaseClient])
 
   /**
    * Apple 소셜 로그인
@@ -185,6 +185,32 @@ export function useAuth() {
     setError(null)
     setIsLoading(true)
     try {
+      // MSW Mock 환경에서는 API 호출로 처리
+      if (process.env.NODE_ENV === 'development') {
+        const response = await fetch('/api/auth/login/apple', {
+          method: 'POST',
+        })
+        if (!response.ok) {
+          throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
+        }
+        const data = await response.json()
+        const userData: User = {
+          id: data.user.id,
+          email: data.user.email,
+          nickname: data.user.nickname,
+          profileImage: data.user.profileImage,
+        }
+        setUser(userData)
+        setIsAuthenticated(true)
+        return userData
+      }
+
+      // 실제 Supabase 환경
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        throw new Error('Supabase client not available')
+      }
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
@@ -218,7 +244,7 @@ export function useAuth() {
     } finally {
       setIsLoading(false)
     }
-  }, [supabase])
+  }, [getSupabaseClient])
 
   /**
    * 로그아웃
@@ -260,7 +286,7 @@ export function useAuth() {
     } finally {
       setIsLoading(false)
     }
-  }, [supabase])
+  }, [getSupabaseClient])
 
   /**
    * 프로필 수정
