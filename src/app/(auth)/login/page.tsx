@@ -23,12 +23,22 @@ export default function LoginPage() {
         router.push('/')
       }
     }
-  }, [isAuthenticated, user, router])
-
   // 로그인된 상태면 리다이렉트만 처리 (화면 표시 안 함)
   if (isAuthenticated) {
     console.log('[LoginPage] 이미 로그인됨, 리다이렉트 대기 중...')
     return null
+  }
+
+  const handleLogin = async (loginFn: () => Promise<any>) => {
+    try {
+      console.log('[LoginPage] 로그인 버튼 클릭')
+      const userData = await loginFn()
+      console.log('[LoginPage] 로그인 완료, 사용자 데이터:', userData)
+      // 로그인 성공 후 리다이렉트는 useEffect에서 처리됨
+    } catch (error) {
+      console.error('[LoginPage] 로그인 실패:', error)
+      // 에러는 useAuth의 error state로 처리됨
+    }
   }
 
   return (
@@ -53,7 +63,7 @@ export default function LoginPage() {
               variant="primary"
               size="lg"
               className="w-full flex items-center justify-center gap-3"
-              onClick={loginWithGoogle}
+              onClick={() => handleLogin(loginWithGoogle)}
               isLoading={isLoading}
               disabled={isLoading}
             >
@@ -70,7 +80,7 @@ export default function LoginPage() {
               variant="secondary"
               size="lg"
               className="w-full flex items-center justify-center gap-3 bg-yellow-400 hover:bg-yellow-500 text-black"
-              onClick={loginWithKakao}
+              onClick={() => handleLogin(loginWithKakao)}
               isLoading={isLoading}
               disabled={isLoading}
             >
@@ -84,7 +94,7 @@ export default function LoginPage() {
               variant="outline"
               size="lg"
               className="w-full flex items-center justify-center gap-3"
-              onClick={loginWithApple}
+              onClick={() => handleLogin(loginWithApple)}
               isLoading={isLoading}
               disabled={isLoading}
             >
