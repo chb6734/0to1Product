@@ -25,7 +25,12 @@ const authHandlers = [
     })
     console.log('[MSW] 생성된 사용자:', user)
     console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
-    return HttpResponse.json({ user, token: 'mock-jwt-token' })
+    // JSON.stringify는 undefined 속성을 제거하므로, nickname이 undefined면 명시적으로 null로 설정하거나
+    // 또는 nickname 속성을 제외한 객체를 반환
+    const responseUser = user.nickname === undefined 
+      ? { ...user, nickname: undefined } // undefined를 명시적으로 포함
+      : user
+    return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' })
   }),
 
   // Kakao 로그인
