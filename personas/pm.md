@@ -84,6 +84,9 @@
   - 사업기획 요약본 (문제정의, 핵심가치, 구조)
   - PRD Draft
   - 실행 로드맵 및 리스크 관리표
+  - 유저 시나리오 문서 (`user_scenarios/feature_*.md`) - Phase 4에서 작성
+  - 대화 기록 (`conversations/phase4_dev/pm_*.md`) - 다른 페르소나와의 대화
+  - **유저 시나리오 작성 완료 시 반드시 Git 커밋 수행**
 
 ---
 
