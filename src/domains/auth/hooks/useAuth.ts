@@ -39,6 +39,27 @@ export function useAuth() {
     setError(null)
     setIsLoading(true)
     try {
+      // MSW Mock 환경에서는 API 호출로 처리
+      if (process.env.NODE_ENV === 'development') {
+        const response = await fetch('/api/auth/login/google', {
+          method: 'POST',
+        })
+        if (!response.ok) {
+          throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
+        }
+        const data = await response.json()
+        const userData: User = {
+          id: data.user.id,
+          email: data.user.email,
+          nickname: data.user.nickname,
+          profileImage: data.user.profileImage,
+        }
+        setUser(userData)
+        setIsAuthenticated(true)
+        return userData
+      }
+
+      // 실제 Supabase 환경
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -82,6 +103,27 @@ export function useAuth() {
     setError(null)
     setIsLoading(true)
     try {
+      // MSW Mock 환경에서는 API 호출로 처리
+      if (process.env.NODE_ENV === 'development') {
+        const response = await fetch('/api/auth/login/kakao', {
+          method: 'POST',
+        })
+        if (!response.ok) {
+          throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
+        }
+        const data = await response.json()
+        const userData: User = {
+          id: data.user.id,
+          email: data.user.email,
+          nickname: data.user.nickname,
+          profileImage: data.user.profileImage,
+        }
+        setUser(userData)
+        setIsAuthenticated(true)
+        return userData
+      }
+
+      // 실제 Supabase 환경
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'kakao',
         options: {
@@ -166,6 +208,17 @@ export function useAuth() {
     setError(null)
     setIsLoading(true)
     try {
+      // MSW Mock 환경에서는 API 호출로 처리
+      if (process.env.NODE_ENV === 'development') {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+        })
+        setUser(null)
+        setIsAuthenticated(false)
+        return
+      }
+
+      // 실제 Supabase 환경
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 
