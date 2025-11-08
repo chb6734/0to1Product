@@ -18,9 +18,11 @@ export default function LoginPage() {
       if (!user.nickname) {
         console.log('[LoginPage] 닉네임 없음 → 온보딩 페이지로 리다이렉트')
         router.push('/onboarding')
+        return // 리다이렉트 후 즉시 반환
       } else {
         console.log('[LoginPage] 닉네임 있음 → 메인 페이지로 리다이렉트')
         router.push('/')
+        return // 리다이렉트 후 즉시 반환
       }
     }
   }, [isAuthenticated, user, router])
