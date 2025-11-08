@@ -16,9 +16,10 @@ const authHandlers = [
     if (url.searchParams.get('error') === 'network') {
       return HttpResponse.error()
     }
+    // 신규 사용자는 닉네임이 없음 (온보딩 필요)
     const user = createMockUser({
       email: 'google@example.com',
-      nickname: 'Google User',
+      nickname: undefined, // 신규 사용자는 닉네임 없음
     })
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
@@ -30,9 +31,10 @@ const authHandlers = [
     if (url.searchParams.get('error') === 'network') {
       return HttpResponse.error()
     }
+    // 신규 사용자는 닉네임이 없음 (온보딩 필요)
     const user = createMockUser({
       email: 'kakao@example.com',
-      nickname: 'Kakao User',
+      nickname: undefined, // 신규 사용자는 닉네임 없음
     })
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
@@ -44,9 +46,10 @@ const authHandlers = [
     if (url.searchParams.get('error') === 'network') {
       return HttpResponse.error()
     }
+    // 신규 사용자는 닉네임이 없음 (온보딩 필요)
     const user = createMockUser({
       email: 'apple@example.com',
-      nickname: 'Apple User',
+      nickname: undefined, // 신규 사용자는 닉네임 없음
     })
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
