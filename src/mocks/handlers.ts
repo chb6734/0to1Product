@@ -18,17 +18,19 @@ const authHandlers = [
       return HttpResponse.error()
     }
     // 신규 사용자는 닉네임이 없음 (온보딩 필요)
+    // nickname을 명시적으로 undefined로 설정하기 위해 객체에 포함
     const user = createMockUser({
       email: 'google@example.com',
       nickname: undefined, // 신규 사용자는 닉네임 없음
     })
     console.log('[MSW] 생성된 사용자:', user)
-    console.log('[MSW] 닉네임 존재 여부:', !!user.nickname)
+    console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
 
   // Kakao 로그인
   http.post('/api/auth/login/kakao', async ({ request }) => {
+    console.log('[MSW] Kakao 로그인 핸들러 호출됨')
     await delay(500)
     const url = new URL(request.url)
     if (url.searchParams.get('error') === 'network') {
@@ -39,11 +41,14 @@ const authHandlers = [
       email: 'kakao@example.com',
       nickname: undefined, // 신규 사용자는 닉네임 없음
     })
+    console.log('[MSW] 생성된 사용자:', user)
+    console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
 
   // Apple 로그인
   http.post('/api/auth/login/apple', async ({ request }) => {
+    console.log('[MSW] Apple 로그인 핸들러 호출됨')
     await delay(500)
     const url = new URL(request.url)
     if (url.searchParams.get('error') === 'network') {
@@ -54,6 +59,8 @@ const authHandlers = [
       email: 'apple@example.com',
       nickname: undefined, // 신규 사용자는 닉네임 없음
     })
+    console.log('[MSW] 생성된 사용자:', user)
+    console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
 

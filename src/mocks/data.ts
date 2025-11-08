@@ -102,8 +102,11 @@ export let mockLetters: MockLetter[] = [
 export function createMockUser(overrides?: Partial<MockUser>): MockUser {
   const id = overrides?.id || `user-${Date.now()}`
   const email = overrides?.email || `user${Date.now()}@example.com`
-  // nickname이 undefined로 명시적으로 전달되면 undefined 유지, 아니면 기본값 사용
-  const nickname = overrides?.nickname !== undefined ? overrides.nickname : `User${Date.now()}`
+  // nickname이 명시적으로 undefined로 전달되면 undefined 유지
+  // overrides에 nickname 속성이 없으면 기본값 사용
+  const nickname = 'nickname' in (overrides || {}) 
+    ? overrides?.nickname 
+    : `User${Date.now()}`
   const profileImage = overrides?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`
   const createdAt = overrides?.createdAt || new Date().toISOString()
 
