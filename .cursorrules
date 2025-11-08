@@ -137,7 +137,10 @@ PRD 작성 시 다음 섹션 포함:
 20. 최종 디자인 가이드 확정
 
 ### 파일 저장 규칙
-- 모든 대화는 `conversations/` 디렉토리에 저장
+- 모든 대화는 `conversations/` 디렉토리에 단계별로 저장
+  - Phase 1 (CEO-PM): `conversations/` (기존)
+  - Phase 2 (TPM): `conversations/phase2_tpm/`
+  - Phase 3 (Designer): `conversations/phase3_designer/`
 - PRD는 `prd/` 디렉토리에 버전별 저장
 - 기술 문서는 `tech/` 디렉토리에 저장
 - 디자인 문서는 `design/` 디렉토리에 저장

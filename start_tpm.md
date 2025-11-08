@@ -27,6 +27,15 @@ TPM이 PRD v2를 분석하여 다음을 수행하세요:
 
 각 단계마다:
 - 기술 문서를 tech/ 디렉토리에 저장
+- **대화 기록을 conversations/phase2_tpm/ 디렉토리에 저장**
 - PM과 CEO의 피드백을 받아 개선
 - 변경사항을 Git에 커밋하세요
+
+## 대화 저장 형식
+
+각 대화는 다음 형식으로 저장하세요:
+- `conversations/phase2_tpm/tpm_analysis_1.md` - TPM의 PRD 분석
+- `conversations/phase2_tpm/pm_tpm_discussion_1.md` - PM과 TPM의 논의
+- `conversations/phase2_tpm/tpm_tech_stack_review.md` - 기술 스택 검토
+- `conversations/phase2_tpm/ceo_tpm_feedback.md` - CEO의 기술 설계 피드백
 
