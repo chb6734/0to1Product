@@ -30,7 +30,16 @@ export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  const supabase = createClient()
+  
+  // Supabase 클라이언트는 실제 Supabase 환경에서만 필요하므로 lazy하게 생성
+  const getSupabaseClient = useCallback(() => {
+    try {
+      return createClient()
+    } catch {
+      // 개발 환경에서 환경 변수가 없으면 null 반환 (MSW 사용)
+      return null
+    }
+  }, [])
 
   /**
    * Google 소셜 로그인
@@ -60,6 +69,11 @@ export function useAuth() {
       }
 
       // 실제 Supabase 환경
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        throw new Error('Supabase client not available')
+      }
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -124,6 +138,11 @@ export function useAuth() {
       }
 
       // 실제 Supabase 환경
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        throw new Error('Supabase client not available')
+      }
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'kakao',
         options: {
@@ -219,6 +238,14 @@ export function useAuth() {
       }
 
       // 실제 Supabase 환경
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        // 개발 환경에서 Supabase가 없으면 로그아웃만 처리
+        setUser(null)
+        setIsAuthenticated(false)
+        return
+      }
+      
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 
@@ -294,7 +321,7 @@ export function useAuth() {
     } finally {
       setIsLoading(false)
     }
-  }, [user, supabase])
+  }, [user, getSupabaseClient])
 
   return {
     user,
