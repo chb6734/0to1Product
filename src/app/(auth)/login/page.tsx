@@ -17,13 +17,15 @@ export default function LoginPage() {
       // 닉네임이 없으면 온보딩 페이지로, 있으면 메인 페이지로
       if (!user.nickname) {
         console.log('[LoginPage] 닉네임 없음 → 온보딩 페이지로 리다이렉트')
-        router.replace('/onboarding') // replace 사용으로 히스토리 스택에 추가하지 않음
+        // window.location을 사용하여 강제 리다이렉트 (클라이언트 네비게이션 문제 해결)
+        window.location.href = '/onboarding'
       } else {
         console.log('[LoginPage] 닉네임 있음 → 메인 페이지로 리다이렉트')
-        router.replace('/') // replace 사용으로 히스토리 스택에 추가하지 않음
+        // window.location을 사용하여 강제 리다이렉트
+        window.location.href = '/'
       }
     }
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, user])
 
   // 로그인된 상태면 리다이렉트만 처리 (화면 표시 안 함)
   if (isAuthenticated) {
