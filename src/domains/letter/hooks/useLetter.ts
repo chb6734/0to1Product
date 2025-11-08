@@ -34,6 +34,8 @@ export function useLetter() {
     tracks: [],
     message: '',
   })
+  const [isCreating, setIsCreating] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
 
   /**
    * 곡 추가
@@ -85,9 +87,12 @@ export function useLetter() {
    */
   const setMessage = useCallback((message: string) => {
     if (message.length > MAX_MESSAGE_LENGTH) {
-      throw new Error(LETTER_ERROR_MESSAGES.MESSAGE_TOO_LONG)
+      const error = new Error(LETTER_ERROR_MESSAGES.MESSAGE_TOO_LONG)
+      setError(error)
+      throw error
     }
 
+    setError(null)
     setLetter((prev) => ({
       ...prev,
       message,
@@ -99,9 +104,12 @@ export function useLetter() {
    */
   const addTrackMemo = useCallback((trackId: string, memo: string) => {
     if (memo.length > MAX_MEMO_LENGTH) {
-      throw new Error(LETTER_ERROR_MESSAGES.MEMO_TOO_LONG)
+      const error = new Error(LETTER_ERROR_MESSAGES.MEMO_TOO_LONG)
+      setError(error)
+      throw error
     }
 
+    setError(null)
     setLetter((prev) => ({
       ...prev,
       tracks: prev.tracks.map((track) =>
@@ -111,41 +119,75 @@ export function useLetter() {
   }, [])
 
   /**
+   * 편지 초기화
+   */
+  const resetLetter = useCallback(() => {
+    setLetter({
+      tracks: [],
+      message: '',
+    })
+    setError(null)
+  }, [])
+
+  /**
    * 편지 생성
    */
   const createLetter = useCallback(async () => {
+    if (isCreating) {
+      return // 중복 생성 방지
+    }
+
     if (letter.tracks.length < MIN_TRACKS_COUNT) {
-      throw new Error(LETTER_ERROR_MESSAGES.NO_TRACKS)
+      const error = new Error(LETTER_ERROR_MESSAGES.NO_TRACKS)
+      setError(error)
+      throw error
     }
 
-    // API 호출 시뮬레이션
-    const response = await fetch('/api/letters', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        tracks: letter.tracks,
-        message: letter.message,
-      }),
-    })
+    setIsCreating(true)
+    setError(null)
+    
+    try {
+      // API 호출 시뮬레이션
+      const response = await fetch('/api/letters', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tracks: letter.tracks,
+          message: letter.message,
+        }),
+      })
 
-    if (!response.ok) {
-      throw new Error(LETTER_ERROR_MESSAGES.CREATION_FAILED)
+      if (!response.ok) {
+        throw new Error(LETTER_ERROR_MESSAGES.CREATION_FAILED)
+      }
+
+      const data = await response.json()
+      return data.id
+    } catch (error) {
+      const letterError = error instanceof Error 
+        ? error 
+        : new Error(LETTER_ERROR_MESSAGES.CREATION_FAILED)
+      setError(letterError)
+      // 에러 발생 시에도 편지 데이터는 유지됨
+      throw letterError
+    } finally {
+      setIsCreating(false)
     }
-
-    const data = await response.json()
-    return data.id
-  }, [letter])
+  }, [letter, isCreating])
 
   return {
     letter,
+    isCreating,
+    error,
     addTrack,
     removeTrack,
     reorderTracks,
     setMessage,
     addTrackMemo,
     createLetter,
+    resetLetter,
   }
 }
 

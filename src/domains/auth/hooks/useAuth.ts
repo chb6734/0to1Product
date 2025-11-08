@@ -34,6 +34,8 @@ export function useAuth() {
    * Google 소셜 로그인
    */
   const loginWithGoogle = useCallback(async () => {
+    setError(null)
+    setIsLoading(true)
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -61,7 +63,13 @@ export function useAuth() {
 
       throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
     } catch (error) {
-      throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
+      const authError = error instanceof Error 
+        ? error 
+        : new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
+      setError(authError)
+      throw authError
+    } finally {
+      setIsLoading(false)
     }
   }, [supabase])
 
@@ -69,6 +77,8 @@ export function useAuth() {
    * Kakao 소셜 로그인
    */
   const loginWithKakao = useCallback(async () => {
+    setError(null)
+    setIsLoading(true)
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'kakao',
@@ -95,7 +105,13 @@ export function useAuth() {
 
       throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
     } catch (error) {
-      throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
+      const authError = error instanceof Error 
+        ? error 
+        : new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
+      setError(authError)
+      throw authError
+    } finally {
+      setIsLoading(false)
     }
   }, [supabase])
 
@@ -103,6 +119,8 @@ export function useAuth() {
    * Apple 소셜 로그인
    */
   const loginWithApple = useCallback(async () => {
+    setError(null)
+    setIsLoading(true)
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
@@ -129,7 +147,13 @@ export function useAuth() {
 
       throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
     } catch (error) {
-      throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
+      const authError = error instanceof Error 
+        ? error 
+        : new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
+      setError(authError)
+      throw authError
+    } finally {
+      setIsLoading(false)
     }
   }, [supabase])
 
@@ -137,6 +161,8 @@ export function useAuth() {
    * 로그아웃
    */
   const logout = useCallback(async () => {
+    setError(null)
+    setIsLoading(true)
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
@@ -144,7 +170,13 @@ export function useAuth() {
       setUser(null)
       setIsAuthenticated(false)
     } catch (error) {
-      throw new Error(AUTH_ERROR_MESSAGES.LOGOUT_FAILED)
+      const authError = error instanceof Error 
+        ? error 
+        : new Error(AUTH_ERROR_MESSAGES.LOGOUT_FAILED)
+      setError(authError)
+      throw authError
+    } finally {
+      setIsLoading(false)
     }
   }, [supabase])
 
@@ -153,24 +185,30 @@ export function useAuth() {
    */
   const updateProfile = useCallback(async (data: ProfileData) => {
     if (!user) {
-      throw new Error(AUTH_ERROR_MESSAGES.LOGIN_REQUIRED)
+      const error = new Error(AUTH_ERROR_MESSAGES.LOGIN_REQUIRED)
+      setError(error)
+      throw error
     }
 
-    // 중복 닉네임 체크
-    if (data.nickname) {
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('nickname', data.nickname)
-        .neq('id', user.id)
-        .single()
-
-      if (existingUser) {
-        throw new Error(AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME)
-      }
-    }
-
+    setError(null)
+    setIsLoading(true)
     try {
+      // 중복 닉네임 체크
+      if (data.nickname) {
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('nickname', data.nickname)
+          .neq('id', user.id)
+          .single()
+
+        if (existingUser) {
+          const error = new Error(AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME)
+          setError(error)
+          throw error
+        }
+      }
+
       const { data: updatedUser, error } = await supabase
         .from('users')
         .update({
@@ -193,16 +231,21 @@ export function useAuth() {
       setUser(updatedUserData)
       return updatedUserData
     } catch (error) {
-      if (error instanceof Error && error.message === AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME) {
-        throw error
-      }
-      throw new Error(AUTH_ERROR_MESSAGES.PROFILE_UPDATE_FAILED)
+      const authError = error instanceof Error 
+        ? error 
+        : new Error(AUTH_ERROR_MESSAGES.PROFILE_UPDATE_FAILED)
+      setError(authError)
+      throw authError
+    } finally {
+      setIsLoading(false)
     }
   }, [user, supabase])
 
   return {
     user,
     isAuthenticated,
+    isLoading,
+    error,
     loginWithGoogle,
     loginWithKakao,
     loginWithApple,
