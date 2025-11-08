@@ -18,18 +18,23 @@ const authHandlers = [
       return HttpResponse.error()
     }
     // 신규 사용자는 닉네임이 없음 (온보딩 필요)
-    // nickname을 명시적으로 undefined로 설정하기 위해 객체에 포함
     const user = createMockUser({
       email: 'google@example.com',
       nickname: undefined, // 신규 사용자는 닉네임 없음
     })
     console.log('[MSW] 생성된 사용자:', user)
     console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
-    // JSON.stringify는 undefined 속성을 제거하므로, nickname이 undefined면 명시적으로 null로 설정하거나
-    // 또는 nickname 속성을 제외한 객체를 반환
-    const responseUser = user.nickname === undefined 
-      ? { ...user, nickname: undefined } // undefined를 명시적으로 포함
+    console.log('[MSW] user.nickname === undefined:', user.nickname === undefined)
+    // JSON.stringify는 undefined 속성을 제거하므로, nickname이 undefined면
+    // 명시적으로 null로 설정하거나, 또는 nickname 속성을 제외한 객체를 반환
+    // 하지만 useAuth에서 data.user.nickname이 없으면 undefined로 처리되므로
+    // nickname 속성을 제외한 객체를 반환하는 것이 더 정확함
+    const { nickname, ...userWithoutNickname } = user
+    const responseUser = nickname === undefined 
+      ? userWithoutNickname // nickname 속성 제외
       : user
+    console.log('[MSW] 응답 user 객체:', responseUser)
+    console.log('[MSW] 응답 user에 nickname 속성 존재:', 'nickname' in responseUser)
     return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' })
   }),
 
@@ -48,7 +53,11 @@ const authHandlers = [
     })
     console.log('[MSW] 생성된 사용자:', user)
     console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
-    return HttpResponse.json({ user, token: 'mock-jwt-token' })
+    const { nickname, ...userWithoutNickname } = user
+    const responseUser = nickname === undefined 
+      ? userWithoutNickname // nickname 속성 제외
+      : user
+    return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' })
   }),
 
   // Apple 로그인
@@ -66,7 +75,11 @@ const authHandlers = [
     })
     console.log('[MSW] 생성된 사용자:', user)
     console.log('[MSW] 닉네임 존재 여부:', !!user.nickname, 'nickname 값:', user.nickname)
-    return HttpResponse.json({ user, token: 'mock-jwt-token' })
+    const { nickname, ...userWithoutNickname } = user
+    const responseUser = nickname === undefined 
+      ? userWithoutNickname // nickname 속성 제외
+      : user
+    return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' })
   }),
 
   // 로그아웃
