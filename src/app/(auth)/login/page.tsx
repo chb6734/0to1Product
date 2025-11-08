@@ -23,6 +23,8 @@ export default function LoginPage() {
         router.push('/')
       }
     }
+  }, [isAuthenticated, user, router])
+
   // 로그인된 상태면 리다이렉트만 처리 (화면 표시 안 함)
   if (isAuthenticated) {
     console.log('[LoginPage] 이미 로그인됨, 리다이렉트 대기 중...')
