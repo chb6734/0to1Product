@@ -9,6 +9,7 @@
  */
 import { useState, useCallback } from 'react'
 import { createClient } from '@/shared/lib/supabase'
+import { AUTH_ERROR_MESSAGES } from '@/shared/constants/errorMessages'
 
 interface User {
   id: string
@@ -58,9 +59,9 @@ export function useAuth() {
         return userData
       }
 
-      throw new Error('로그인에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
     } catch (error) {
-      throw new Error('연결에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
     }
   }, [supabase])
 
@@ -92,9 +93,9 @@ export function useAuth() {
         return userData
       }
 
-      throw new Error('로그인에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
     } catch (error) {
-      throw new Error('연결에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
     }
   }, [supabase])
 
@@ -126,9 +127,9 @@ export function useAuth() {
         return userData
       }
 
-      throw new Error('로그인에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
     } catch (error) {
-      throw new Error('연결에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED)
     }
   }, [supabase])
 
@@ -143,7 +144,7 @@ export function useAuth() {
       setUser(null)
       setIsAuthenticated(false)
     } catch (error) {
-      throw new Error('로그아웃에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.LOGOUT_FAILED)
     }
   }, [supabase])
 
@@ -152,7 +153,7 @@ export function useAuth() {
    */
   const updateProfile = useCallback(async (data: ProfileData) => {
     if (!user) {
-      throw new Error('로그인이 필요합니다')
+      throw new Error(AUTH_ERROR_MESSAGES.LOGIN_REQUIRED)
     }
 
     // 중복 닉네임 체크
@@ -165,7 +166,7 @@ export function useAuth() {
         .single()
 
       if (existingUser) {
-        throw new Error('이미 사용 중인 닉네임입니다')
+        throw new Error(AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME)
       }
     }
 
@@ -192,10 +193,10 @@ export function useAuth() {
       setUser(updatedUserData)
       return updatedUserData
     } catch (error) {
-      if (error instanceof Error && error.message === '이미 사용 중인 닉네임입니다') {
+      if (error instanceof Error && error.message === AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME) {
         throw error
       }
-      throw new Error('프로필 수정에 실패했습니다')
+      throw new Error(AUTH_ERROR_MESSAGES.PROFILE_UPDATE_FAILED)
     }
   }, [user, supabase])
 

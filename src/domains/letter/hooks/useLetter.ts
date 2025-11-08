@@ -10,6 +10,7 @@
  * - 편지 생성
  */
 import { useState, useCallback } from 'react'
+import { LETTER_ERROR_MESSAGES } from '@/shared/constants/errorMessages'
 
 interface Track {
   id: string
@@ -84,7 +85,7 @@ export function useLetter() {
    */
   const setMessage = useCallback((message: string) => {
     if (message.length > MAX_MESSAGE_LENGTH) {
-      throw new Error('최대 500자까지 입력 가능합니다')
+      throw new Error(LETTER_ERROR_MESSAGES.MESSAGE_TOO_LONG)
     }
 
     setLetter((prev) => ({
@@ -98,7 +99,7 @@ export function useLetter() {
    */
   const addTrackMemo = useCallback((trackId: string, memo: string) => {
     if (memo.length > MAX_MEMO_LENGTH) {
-      throw new Error('최대 100자까지 입력 가능합니다')
+      throw new Error(LETTER_ERROR_MESSAGES.MEMO_TOO_LONG)
     }
 
     setLetter((prev) => ({
@@ -114,7 +115,7 @@ export function useLetter() {
    */
   const createLetter = useCallback(async () => {
     if (letter.tracks.length < MIN_TRACKS_COUNT) {
-      throw new Error('최소 1곡 이상 추가해주세요')
+      throw new Error(LETTER_ERROR_MESSAGES.NO_TRACKS)
     }
 
     // API 호출 시뮬레이션
@@ -130,7 +131,7 @@ export function useLetter() {
     })
 
     if (!response.ok) {
-      throw new Error('편지 생성에 실패했습니다')
+      throw new Error(LETTER_ERROR_MESSAGES.CREATION_FAILED)
     }
 
     const data = await response.json()
