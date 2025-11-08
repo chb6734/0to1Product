@@ -17,12 +17,10 @@ export default function LoginPage() {
       // 닉네임이 없으면 온보딩 페이지로, 있으면 메인 페이지로
       if (!user.nickname) {
         console.log('[LoginPage] 닉네임 없음 → 온보딩 페이지로 리다이렉트')
-        router.push('/onboarding')
-        return // 리다이렉트 후 즉시 반환
+        router.replace('/onboarding') // replace 사용으로 히스토리 스택에 추가하지 않음
       } else {
         console.log('[LoginPage] 닉네임 있음 → 메인 페이지로 리다이렉트')
-        router.push('/')
-        return // 리다이렉트 후 즉시 반환
+        router.replace('/') // replace 사용으로 히스토리 스택에 추가하지 않음
       }
     }
   }, [isAuthenticated, user, router])
