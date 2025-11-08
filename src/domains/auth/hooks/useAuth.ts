@@ -7,7 +7,7 @@
  * - 로그아웃
  * - 프로필 조회 및 수정
  */
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/shared/lib/supabase'
 import { AUTH_ERROR_MESSAGES } from '@/shared/constants/errorMessages'
 
@@ -25,11 +25,59 @@ interface ProfileData {
 
 const MAX_NICKNAME_LENGTH = 20
 
+// localStorage 키
+const AUTH_STORAGE_KEY = 'fanstage_auth_user'
+
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  // localStorage에서 초기 상태 복원
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        console.log('[useAuth] localStorage에서 사용자 정보 복원:', parsed)
+        return parsed
+      }
+    } catch (error) {
+      console.error('[useAuth] localStorage 복원 실패:', error)
+    }
+    return null
+  })
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY)
+      return !!stored
+    } catch {
+      return false
+    }
+  })
+  
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  
+  // user 상태 변경 시 localStorage에 저장
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    if (user) {
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user))
+        console.log('[useAuth] localStorage에 사용자 정보 저장:', user)
+      } catch (error) {
+        console.error('[useAuth] localStorage 저장 실패:', error)
+      }
+    } else {
+      try {
+        localStorage.removeItem(AUTH_STORAGE_KEY)
+        console.log('[useAuth] localStorage에서 사용자 정보 제거')
+      } catch (error) {
+        console.error('[useAuth] localStorage 제거 실패:', error)
+      }
+    }
+  }, [user])
   
   // Supabase 클라이언트는 실제 Supabase 환경에서만 필요하므로 lazy하게 생성
   const getSupabaseClient = useCallback(() => {
@@ -267,6 +315,8 @@ export function useAuth() {
         })
         setUser(null)
         setIsAuthenticated(false)
+        // localStorage는 useEffect에서 자동 제거됨
+        console.log('[useAuth] 로그아웃 완료, localStorage에서 사용자 정보 제거됨')
         return
       }
 
