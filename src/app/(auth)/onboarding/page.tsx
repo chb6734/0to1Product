@@ -24,15 +24,15 @@ export default function OnboardingPage() {
   // 로그인하지 않은 사용자는 로그인 페이지로 리다이렉트
   useEffect(() => {
     if (!isAuthenticated) {
-      window.location.href = '/login'
+      router.replace('/login')
       return
     }
     // 이미 닉네임이 있으면 메인 페이지로 리다이렉트
     if (user?.nickname) {
-      window.location.href = '/'
+      router.replace('/')
       return
     }
-  }, [isAuthenticated, user])
+  }, [isAuthenticated, user, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,7 +56,7 @@ export default function OnboardingPage() {
         profileImage: profileImage.trim() || undefined,
       })
       // 프로필 업데이트 성공 시 메인 페이지로 리다이렉트
-      window.location.href = '/'
+      router.replace('/')
     } catch (error) {
       // 에러는 useAuth의 error state로 처리됨
       console.error('프로필 업데이트 실패:', error)
