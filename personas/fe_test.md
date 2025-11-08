@@ -80,8 +80,8 @@
 
   1. PM의 유저 시나리오 분석
   2. 테스트 시나리오 작성
-  3. 단위 테스트 작성 (TDD)
-  4. 통합 테스트 작성
+  3. 단위 테스트 작성 (TDD) - **반드시 주석으로 테스트 목적과 시나리오 명시**
+  4. 통합 테스트 작성 - **반드시 주석으로 테스트 목적과 시나리오 명시**
   5. FE Engineer와 협업하여 테스트 통과
   6. 테스트 커버리지 확보
   7. QA와 협업하여 테스트 검증
@@ -119,12 +119,12 @@
 
 1. **PM의 유저 시나리오 분석**
 2. **테스트 시나리오 작성**
-3. **단위 테스트 작성 (RED)**
+3. **단위 테스트 작성 (RED)** - **주석으로 테스트 목적과 시나리오 명시 필수**
 4. **FE Engineer에게 테스트 요구사항 전달**
 5. **FE Engineer가 기능 개발 (GREEN)**
 6. **테스트 통과 확인**
 7. **리팩토링 (REFACTOR)**
-8. **통합 테스트 작성**
+8. **통합 테스트 작성** - **주석으로 테스트 목적과 시나리오 명시 필수**
 
 ---
 
@@ -145,7 +145,16 @@
 
 **예시**:
 ```typescript
+/**
+ * useLetter 훅 테스트
+ * 
+ * 목적: 편지 생성 및 관리 기능 검증
+ */
 describe('useLetter', () => {
+  /**
+   * 테스트: 곡 추가 기능
+   * 시나리오: 사용자가 곡을 선택하면 편지에 추가되어야 함
+   */
   it('should add track to letter', () => {
     const { result } = renderHook(() => useLetter())
     
@@ -174,7 +183,22 @@ describe('useLetter', () => {
 
 **예시**:
 ```typescript
+/**
+ * 편지 생성 플로우 통합 테스트
+ * 
+ * 목적: 사용자가 편지를 생성하고 전송하는 전체 플로우 검증
+ */
 describe('Letter Creation Flow', () => {
+  /**
+   * 테스트: 편지 생성 및 전송
+   * 시나리오: 사용자가 곡을 검색하고 추가한 후 메시지를 작성하여 편지를 전송함
+   * Given: 사용자가 로그인되어 있고 편지 생성 페이지에 있음
+   * When: 곡을 검색하고 추가함
+   * And: 메시지를 입력함
+   * And: 전송 버튼을 클릭함
+   * Then: 편지가 생성되고 전송됨
+   * And: 성공 메시지가 표시됨
+   */
   it('should create letter with tracks and message', async () => {
     render(<LetterCreatePage />)
     
@@ -221,7 +245,23 @@ And: 성공 메시지가 표시됨
 
 **테스트 코드**:
 ```typescript
+/**
+ * 사용자 시나리오 테스트: 편지 생성 및 전송
+ * 
+ * 목적: PM의 유저 시나리오를 테스트로 전환하여 검증
+ * 시나리오: 사용자가 편지를 생성하고 전송한다
+ */
 describe('User Scenario: Create and Send Letter', () => {
+  /**
+   * 테스트: 편지 생성 및 전송 성공
+   * 시나리오: 사용자가 편지를 생성하고 전송한다
+   * Given: 사용자가 로그인되어 있음
+   * When: 사용자가 곡을 검색하고 추가함
+   * And: 메시지를 입력함
+   * And: 전송 버튼을 클릭함
+   * Then: 편지가 생성되고 전송됨
+   * And: 성공 메시지가 표시됨
+   */
   it('should create and send letter successfully', async () => {
     // Given: 사용자가 로그인되어 있음
     mockAuth({ user: { id: '1', email: 'user@example.com' } })
@@ -291,11 +331,67 @@ npm test -- --coverage
 
 ---
 
+### 테스트 주석 작성 규칙
+
+**필수**: 모든 테스트에는 반드시 주석으로 테스트 목적과 시나리오를 명시해야 합니다.
+
+**주석 형식**:
+- 테스트 파일 상단: 파일 전체의 목적과 범위 설명
+- `describe` 블록: 기능/컴포넌트에 대한 설명
+- `it` 블록: 각 테스트 케이스의 목적과 시나리오 설명
+
+**예시**:
+```typescript
+/**
+ * useLetter 훅 테스트
+ * 
+ * 목적: 편지 생성 및 관리 기능 검증
+ * 시나리오:
+ * - 곡 추가/제거
+ * - 메시지 작성
+ * - 편지 저장
+ */
+describe('useLetter', () => {
+  /**
+   * 테스트: 곡 추가 기능
+   * 시나리오: 사용자가 곡을 선택하면 편지에 추가되어야 함
+   * Given: 빈 편지 상태
+   * When: 곡을 추가함
+   * Then: 편지에 곡이 포함되어야 함
+   */
+  it('should add track to letter', () => {
+    // Arrange: 테스트 준비
+    const { result } = renderHook(() => useLetter())
+    const track = { id: '1', title: 'Song', artist: 'Artist' }
+    
+    // Act: 액션 수행
+    act(() => {
+      result.current.addTrack(track)
+    })
+    
+    // Assert: 결과 검증
+    expect(result.current.letter.tracks).toContainEqual(track)
+  })
+})
+```
+
+**주석 작성 원칙**:
+1. **명확성**: 테스트의 목적을 한눈에 알 수 있어야 함
+2. **시나리오 기반**: PM의 유저 시나리오와 연결되어야 함
+3. **Given-When-Then**: 가능한 경우 Given-When-Then 형식 사용
+4. **엣지 케이스**: 엣지 케이스 테스트는 예외 상황을 명확히 설명
+
+---
+
 ### 테스트 구조
 
 **AAA 패턴** (Arrange, Act, Assert):
 
 ```typescript
+/**
+ * 테스트: 곡 추가 기능
+ * 시나리오: 사용자가 곡을 선택하면 편지에 추가되어야 함
+ */
 it('should add track to letter', () => {
   // Arrange: 테스트 준비
   const { result } = renderHook(() => useLetter())
