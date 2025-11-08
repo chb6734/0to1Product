@@ -9,6 +9,8 @@ export default function LoginPage() {
   const { loginWithGoogle, loginWithKakao, loginWithApple, isLoading, error, isAuthenticated, user } = useAuth()
   const router = useRouter()
 
+  console.log('[LoginPage] 렌더링:', { isAuthenticated, user, isLoading, error: error?.message })
+
   useEffect(() => {
     console.log('[LoginPage] useEffect 실행:', { isAuthenticated, user, hasNickname: !!user?.nickname })
     if (isAuthenticated && user) {
@@ -22,6 +24,12 @@ export default function LoginPage() {
       }
     }
   }, [isAuthenticated, user, router])
+
+  // 로그인된 상태면 리다이렉트만 처리 (화면 표시 안 함)
+  if (isAuthenticated) {
+    console.log('[LoginPage] 이미 로그인됨, 리다이렉트 대기 중...')
+    return null
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-pink-50 px-4">
