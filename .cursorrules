@@ -152,7 +152,7 @@ PRD 작성 시 다음 섹션 포함:
 ### 출력 형식
 테스트 작성 시 다음을 포함:
 1. 테스트 시나리오 문서
-2. 단위 테스트 코드 (Jest, React Testing Library)
+2. 단위 테스트 코드 (Vitest, React Testing Library)
 3. 통합 테스트 코드
 4. 테스트 커버리지 리포트
 

@@ -139,7 +139,7 @@
 - 비즈니스 로직
 
 **도구**:
-- Jest
+- Vitest
 - React Testing Library
 - @testing-library/user-event
 
@@ -168,7 +168,7 @@ describe('useLetter', () => {
 - API 통합
 
 **도구**:
-- Jest
+- Vitest
 - React Testing Library
 - MSW (Mock Service Worker)
 
@@ -269,7 +269,7 @@ describe('User Scenario: Create and Send Letter', () => {
 
 ### 커버리지 측정
 
-**도구**: Jest Coverage
+**도구**: Vitest Coverage
 
 **명령어**:
 ```bash

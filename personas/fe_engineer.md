@@ -192,7 +192,7 @@
 - **코드 포맷팅**: Prettier
 - **린팅**: ESLint
 - **타입 체크**: TypeScript
-- **테스트**: Jest, React Testing Library
+- **테스트**: Vitest, React Testing Library
 - **버전 관리**: Git
 
 ### 개발 워크플로우
