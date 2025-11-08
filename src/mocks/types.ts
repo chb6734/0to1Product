@@ -6,7 +6,7 @@
 export interface MockUser {
   id: string
   email: string
-  nickname: string
+  nickname?: string  // 선택적 필드로 변경 (신규 사용자는 닉네임 없음)
   profileImage?: string
   createdAt: string
 }

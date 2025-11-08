@@ -45,26 +45,33 @@ export function useAuth() {
    * Google 소셜 로그인
    */
   const loginWithGoogle = useCallback(async () => {
+    console.log('[useAuth] loginWithGoogle 시작')
     setError(null)
     setIsLoading(true)
     try {
       // MSW Mock 환경에서는 API 호출로 처리
       if (process.env.NODE_ENV === 'development') {
+        console.log('[useAuth] MSW Mock 환경에서 로그인 시도')
         const response = await fetch('/api/auth/login/google', {
           method: 'POST',
         })
+        console.log('[useAuth] API 응답 상태:', response.status, response.ok)
         if (!response.ok) {
           throw new Error(AUTH_ERROR_MESSAGES.LOGIN_FAILED)
         }
         const data = await response.json()
+        console.log('[useAuth] API 응답 데이터:', data)
         const userData: User = {
           id: data.user.id,
           email: data.user.email,
           nickname: data.user.nickname,
           profileImage: data.user.profileImage,
         }
+        console.log('[useAuth] 사용자 데이터 설정:', userData)
+        console.log('[useAuth] 닉네임 존재 여부:', !!userData.nickname, 'nickname 값:', userData.nickname)
         setUser(userData)
         setIsAuthenticated(true)
+        console.log('[useAuth] 로그인 완료, isAuthenticated:', true, 'user:', userData)
         return userData
       }
 
