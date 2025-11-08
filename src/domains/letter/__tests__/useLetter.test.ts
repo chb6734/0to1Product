@@ -11,6 +11,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useLetter } from '../hooks/useLetter'
+import { http, HttpResponse } from 'msw'
+import { server } from '@/mocks/server'
+import { mockTracks } from '@/mocks/data'
 
 describe('useLetter', () => {
   beforeEach(() => {
@@ -26,7 +29,7 @@ describe('useLetter', () => {
    */
   it('should add track to letter', () => {
     const { result } = renderHook(() => useLetter())
-    const track = { id: '1', title: 'Song', artist: 'Artist', albumCover: 'cover.jpg' }
+    const track = mockTracks[0]
 
     act(() => {
       result.current.addTrack(track)
@@ -45,22 +48,20 @@ describe('useLetter', () => {
    */
   it('should remove track from letter', () => {
     const { result } = renderHook(() => useLetter())
-    const track1 = { id: '1', title: 'Song 1', artist: 'Artist 1', albumCover: 'cover1.jpg' }
-    const track2 = { id: '2', title: 'Song 2', artist: 'Artist 2', albumCover: 'cover2.jpg' }
 
     act(() => {
-      result.current.addTrack(track1)
-      result.current.addTrack(track2)
+      result.current.addTrack(mockTracks[0])
+      result.current.addTrack(mockTracks[1])
     })
 
     expect(result.current.letter.tracks).toHaveLength(2)
 
     act(() => {
-      result.current.removeTrack('1')
+      result.current.removeTrack(mockTracks[0].id)
     })
 
     expect(result.current.letter.tracks).toHaveLength(1)
-    expect(result.current.letter.tracks[0].id).toBe('2')
+    expect(result.current.letter.tracks[0].id).toBe(mockTracks[1].id)
   })
 
   /**
@@ -72,24 +73,21 @@ describe('useLetter', () => {
    */
   it('should reorder tracks', () => {
     const { result } = renderHook(() => useLetter())
-    const track1 = { id: '1', title: 'Song 1', artist: 'Artist 1', albumCover: 'cover1.jpg' }
-    const track2 = { id: '2', title: 'Song 2', artist: 'Artist 2', albumCover: 'cover2.jpg' }
-    const track3 = { id: '3', title: 'Song 3', artist: 'Artist 3', albumCover: 'cover3.jpg' }
 
     act(() => {
-      result.current.addTrack(track1)
-      result.current.addTrack(track2)
-      result.current.addTrack(track3)
+      result.current.addTrack(mockTracks[0])
+      result.current.addTrack(mockTracks[1])
+      result.current.addTrack(mockTracks[2])
     })
 
-    expect(result.current.letter.tracks[0].id).toBe('1')
+    expect(result.current.letter.tracks[0].id).toBe(mockTracks[0].id)
 
     act(() => {
       result.current.reorderTracks(0, 2)
     })
 
-    expect(result.current.letter.tracks[0].id).toBe('2')
-    expect(result.current.letter.tracks[2].id).toBe('1')
+    expect(result.current.letter.tracks[0].id).toBe(mockTracks[1].id)
+    expect(result.current.letter.tracks[2].id).toBe(mockTracks[0].id)
   })
 
   /**
@@ -137,12 +135,11 @@ describe('useLetter', () => {
    */
   it('should add memo to track', () => {
     const { result } = renderHook(() => useLetter())
-    const track = { id: '1', title: 'Song', artist: 'Artist', albumCover: 'cover.jpg' }
     const memo = '이 곡이 가장 좋아하는 곡이야'
 
     act(() => {
-      result.current.addTrack(track)
-      result.current.addTrackMemo('1', memo)
+      result.current.addTrack(mockTracks[0])
+      result.current.addTrackMemo(mockTracks[0].id, memo)
     })
 
     expect(result.current.letter.tracks[0].memo).toBe(memo)
@@ -164,7 +161,7 @@ describe('useLetter', () => {
   })
 
   /**
-   * 테스트: 편지 생성
+   * 테스트: 편지 생성 성공
    * 시나리오: 사용자가 곡과 메시지를 추가하여 편지를 생성함
    * Given: 편지에 최소 1곡과 메시지가 있음
    * When: 편지 생성을 시도함
@@ -172,10 +169,9 @@ describe('useLetter', () => {
    */
   it('should create letter with tracks and message', async () => {
     const { result } = renderHook(() => useLetter())
-    const track = { id: '1', title: 'Song', artist: 'Artist', albumCover: 'cover.jpg' }
 
     act(() => {
-      result.current.addTrack(track)
+      result.current.addTrack(mockTracks[0])
       result.current.setMessage('생일 축하해!')
     })
 
@@ -183,6 +179,62 @@ describe('useLetter', () => {
       const letterId = await result.current.createLetter()
       expect(letterId).toBeDefined()
     })
+  })
+
+  /**
+   * 테스트: 편지 생성 네트워크 오류 처리
+   * 시나리오: 편지 생성 중 네트워크 오류 발생
+   * Given: 편지에 곡과 메시지가 있음
+   * When: 네트워크 오류가 발생함
+   * Then: 에러가 발생하고 편지 데이터는 유지됨
+   */
+  it('should handle network error during letter creation', async () => {
+    // 네트워크 오류 시뮬레이션
+    server.use(
+      http.post('/api/letters', async () => {
+        return HttpResponse.error()
+      })
+    )
+
+    const { result } = renderHook(() => useLetter())
+
+    act(() => {
+      result.current.addTrack(mockTracks[0])
+      result.current.setMessage('network-error')
+    })
+
+    await expect(
+      result.current.createLetter()
+    ).rejects.toThrow()
+
+    // 편지 데이터는 유지되어야 함
+    expect(result.current.letter.tracks).toHaveLength(1)
+  })
+
+  /**
+   * 테스트: 편지 초기화
+   * 시나리오: 사용자가 편지를 초기화함
+   * Given: 편지에 곡과 메시지가 있음
+   * When: 편지를 초기화함
+   * Then: 편지가 빈 상태로 돌아감
+   */
+  it('should reset letter', () => {
+    const { result } = renderHook(() => useLetter())
+
+    act(() => {
+      result.current.addTrack(mockTracks[0])
+      result.current.setMessage('테스트 메시지')
+    })
+
+    expect(result.current.letter.tracks).toHaveLength(1)
+    expect(result.current.letter.message).toBe('테스트 메시지')
+
+    act(() => {
+      result.current.resetLetter()
+    })
+
+    expect(result.current.letter.tracks).toHaveLength(0)
+    expect(result.current.letter.message).toBe('')
   })
 })
 

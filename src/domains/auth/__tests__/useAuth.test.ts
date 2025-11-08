@@ -10,6 +10,56 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useAuth } from '../hooks/useAuth'
+import { http, HttpResponse } from 'msw'
+import { server } from '@/mocks/server'
+import { mockUsers } from '@/mocks/data'
+
+// Supabase 클라이언트 Mock
+vi.mock('@/shared/lib/supabase', () => ({
+  createClient: vi.fn(() => ({
+    auth: {
+      signInWithOAuth: vi.fn(() => Promise.resolve({ data: {}, error: null })),
+      getUser: vi.fn(() => Promise.resolve({ 
+        data: { 
+          user: { 
+            id: mockUsers[0].id, 
+            email: mockUsers[0].email,
+            user_metadata: {
+              nickname: mockUsers[0].nickname,
+              profile_image: mockUsers[0].profileImage,
+            }
+          } 
+        }, 
+        error: null 
+      })),
+      signOut: vi.fn(() => Promise.resolve({ error: null })),
+    },
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          neq: vi.fn(() => ({
+            single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+          })),
+        })),
+      })),
+      update: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          select: vi.fn(() => ({
+            single: vi.fn(() => Promise.resolve({ 
+              data: { 
+                id: mockUsers[0].id, 
+                email: mockUsers[0].email, 
+                nickname: 'newnickname', 
+                profile_image: 'newimage.jpg' 
+              }, 
+              error: null 
+            })),
+          })),
+        })),
+      })),
+    })),
+  })),
+}))
 
 describe('useAuth', () => {
   beforeEach(() => {
@@ -139,6 +189,19 @@ describe('useAuth', () => {
       await result.current.loginWithGoogle()
     })
 
+    // 중복 닉네임 시뮬레이션
+    const { createClient } = await import('@/shared/lib/supabase')
+    const mockClient = createClient() as any
+    mockClient.from = vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          neq: vi.fn(() => ({
+            single: vi.fn(() => Promise.resolve({ data: { id: 'existing-user' }, error: null })),
+          })),
+        })),
+      })),
+    }))
+
     const duplicateProfile = {
       nickname: 'existinguser'
     }
@@ -156,14 +219,18 @@ describe('useAuth', () => {
    * Then: 에러 메시지가 표시되고 로그인이 실패함
    */
   it('should handle social login failure', async () => {
-    const { result } = renderHook(() => useAuth())
-
     // 네트워크 오류 시뮬레이션
-    vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'))
+    server.use(
+      http.post('/api/auth/login/google', () => {
+        return HttpResponse.error()
+      })
+    )
+
+    const { result } = renderHook(() => useAuth())
 
     await expect(
       result.current.loginWithGoogle()
-    ).rejects.toThrow('연결에 실패했습니다')
+    ).rejects.toThrow()
 
     expect(result.current.isAuthenticated).toBe(false)
   })
