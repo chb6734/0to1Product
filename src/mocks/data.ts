@@ -109,9 +109,11 @@ export function createMockUser(overrides?: Partial<MockUser>): MockUser {
   if (overrides && 'nickname' in overrides) {
     // nickname 속성이 명시적으로 전달됨 (undefined 포함)
     nickname = overrides.nickname
+    console.log('[createMockUser] nickname 속성 존재, 값:', nickname, '타입:', typeof nickname, '=== undefined:', nickname === undefined)
   } else {
     // nickname 속성이 없으면 기본값 생성
     nickname = `User${Date.now()}`
+    console.log('[createMockUser] nickname 속성 없음, 기본값 생성:', nickname)
   }
   
   const profileImage = overrides?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`
@@ -124,6 +126,9 @@ export function createMockUser(overrides?: Partial<MockUser>): MockUser {
     profileImage,
     createdAt,
   }
+  
+  console.log('[createMockUser] 최종 user 객체:', user)
+  console.log('[createMockUser] 최종 user.nickname:', user.nickname, '=== undefined:', user.nickname === undefined)
   
   return user
 }
