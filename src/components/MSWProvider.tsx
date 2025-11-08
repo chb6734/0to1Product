@@ -12,27 +12,28 @@ export function MSWProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-      // 브라우저 환경에서만 MSW 초기화 (server.ts는 import하지 않음)
-      import('../mocks/init')
-        .then(() => {
-          // MSW 초기화 완료 대기
-          setTimeout(() => {
-            setIsReady(true)
-          }, 100)
-        })
-        .catch((error) => {
+    async function initMSW() {
+      if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+        try {
+          // 브라우저 환경에서만 MSW 초기화 (server.ts는 import하지 않음)
+          const { enableMocking } = await import('../mocks/init')
+          await enableMocking()
+          setIsReady(true)
+        } catch (error) {
           console.error('MSW 초기화 실패:', error)
           setIsReady(true) // 에러가 나도 앱은 계속 실행
-        })
-    } else {
-      setIsReady(true)
+        }
+      } else {
+        setIsReady(true)
+      }
     }
+
+    initMSW()
   }, [])
 
-  // MSW가 준비될 때까지 로딩 표시 (선택적)
+  // MSW가 준비될 때까지 대기
   if (!isReady) {
-    return null // 또는 로딩 스피너
+    return null
   }
 
   return <>{children}</>
