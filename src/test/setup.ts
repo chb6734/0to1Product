@@ -1,6 +1,7 @@
 import { expect, afterEach, beforeAll, afterAll } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom'
+// server.ts는 Node 환경에서만 import (브라우저 번들에서 제외)
 import { server } from '../mocks/server'
 
 // MSW 서버 시작 (테스트 전)

@@ -41,6 +41,10 @@
     "msw": "^2.3.0",
     "@vitest/coverage-v8": "^1.6.0"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }
-
