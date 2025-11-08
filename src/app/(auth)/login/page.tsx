@@ -10,11 +10,14 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
+    console.log('[LoginPage] useEffect 실행:', { isAuthenticated, user, hasNickname: !!user?.nickname })
     if (isAuthenticated && user) {
       // 닉네임이 없으면 온보딩 페이지로, 있으면 메인 페이지로
       if (!user.nickname) {
+        console.log('[LoginPage] 닉네임 없음 → 온보딩 페이지로 리다이렉트')
         router.push('/onboarding')
       } else {
+        console.log('[LoginPage] 닉네임 있음 → 메인 페이지로 리다이렉트')
         router.push('/')
       }
     }

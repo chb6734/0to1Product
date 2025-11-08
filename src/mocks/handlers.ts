@@ -11,6 +11,7 @@ import type { MockUser, MockTrack, MockLetter } from './types'
 const authHandlers = [
   // Google 로그인
   http.post('/api/auth/login/google', async ({ request }) => {
+    console.log('[MSW] Google 로그인 핸들러 호출됨')
     await delay(500)
     const url = new URL(request.url)
     if (url.searchParams.get('error') === 'network') {
@@ -21,6 +22,8 @@ const authHandlers = [
       email: 'google@example.com',
       nickname: undefined, // 신규 사용자는 닉네임 없음
     })
+    console.log('[MSW] 생성된 사용자:', user)
+    console.log('[MSW] 닉네임 존재 여부:', !!user.nickname)
     return HttpResponse.json({ user, token: 'mock-jwt-token' })
   }),
 
