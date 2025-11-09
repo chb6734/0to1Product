@@ -14,15 +14,18 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function OnboardingPage() {
-  const { user, updateProfile, isLoading, error, isAuthenticated } = useAuth();
+  const { user, updateProfile, isLoading, error, isAuthenticated, isInitializing } = useAuth();
   const router = useRouter();
   const [nickname, setNickname] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // 로그인하지 않은 사용자는 로그인 페이지로 리다이렉트
+  // 초기화 중이면 대기
   useEffect(() => {
+    if (isInitializing) return;
+
+    // 로그인하지 않은 사용자는 로그인 페이지로 리다이렉트
     if (!isAuthenticated) {
       router.replace("/login");
       return;
@@ -32,7 +35,7 @@ export default function OnboardingPage() {
       router.replace("/");
       return;
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, isInitializing]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +67,17 @@ export default function OnboardingPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-pink-50 px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || user?.nickname) {
     return null; // 리다이렉트 중

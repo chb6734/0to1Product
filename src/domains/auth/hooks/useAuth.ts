@@ -57,6 +57,7 @@ export function useAuth() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // user 상태 변경 시 localStorage에 저장
   useEffect(() => {
@@ -92,9 +93,14 @@ export function useAuth() {
   // 페이지 로드 시 현재 세션 확인
   useEffect(() => {
     const checkSession = async () => {
+      setIsInitializing(true);
       try {
         const supabase = getSupabaseClient();
-        if (!supabase) return;
+        if (!supabase) {
+          // Supabase 클라이언트가 없으면 localStorage만 확인
+          setIsInitializing(false);
+          return;
+        }
 
         const {
           data: { session },
@@ -125,9 +131,35 @@ export function useAuth() {
             setIsAuthenticated(true);
             console.log("[useAuth] 세션 복원 완료:", userData);
           }
+        } else {
+          // 세션이 없으면 localStorage 확인
+          const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              setUser(parsed);
+              setIsAuthenticated(true);
+              console.log("[useAuth] localStorage에서 사용자 정보 복원:", parsed);
+            } catch (error) {
+              console.error("[useAuth] localStorage 파싱 실패:", error);
+            }
+          }
         }
       } catch (error) {
         console.error("[useAuth] 세션 확인 실패:", error);
+        // 에러 발생 시 localStorage 확인
+        const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            setUser(parsed);
+            setIsAuthenticated(true);
+          } catch (parseError) {
+            console.error("[useAuth] localStorage 파싱 실패:", parseError);
+          }
+        }
+      } finally {
+        setIsInitializing(false);
       }
     };
 
@@ -344,6 +376,7 @@ export function useAuth() {
     user,
     isAuthenticated,
     isLoading,
+    isInitializing,
     error,
     loginWithGoogle,
     loginWithKakao,
