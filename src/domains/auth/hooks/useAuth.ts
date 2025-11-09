@@ -244,26 +244,12 @@ export function useAuth() {
     setError(null);
     setIsLoading(true);
     try {
-      // MSW Mock 환경에서는 API 호출로 처리
-      if (process.env.NODE_ENV === "development") {
-        await fetch("/api/auth/logout", {
-          method: "POST",
-        });
-        setUser(null);
-        setIsAuthenticated(false);
-        // localStorage는 useEffect에서 자동 제거됨
-        console.log(
-          "[useAuth] 로그아웃 완료, localStorage에서 사용자 정보 제거됨"
-        );
-        return;
-      }
-
-      // 실제 Supabase 환경
       const supabase = getSupabaseClient();
       if (!supabase) {
-        // 개발 환경에서 Supabase가 없으면 로그아웃만 처리
+        // Supabase가 없으면 로컬 상태만 초기화
         setUser(null);
         setIsAuthenticated(false);
+        setIsLoading(false);
         return;
       }
 
