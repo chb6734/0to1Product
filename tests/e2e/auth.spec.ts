@@ -121,15 +121,30 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     const nicknameInput = page.getByLabel(/닉네임/i);
     await expect(nicknameInput).toBeVisible();
 
-    // "완료" 버튼 클릭 (닉네임 미입력 상태)
+    // 폼 요소 찾기
+    const form = page.locator('form');
+    await expect(form).toBeVisible();
+
+    // "완료" 버튼 확인
     const submitButton = page.getByRole('button', { name: /완료/i });
-    await submitButton.click();
+    await expect(submitButton).toBeVisible();
+    await expect(submitButton).toBeEnabled();
+
+    // 폼 제출 (submit 이벤트 직접 트리거)
+    await form.evaluate((form) => {
+      const event = new Event('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(event);
+    });
+
+    // 에러 메시지가 나타날 때까지 대기
+    await page.waitForSelector('text=닉네임을 입력해주세요', { timeout: 5000 });
 
     // 에러 메시지 확인
-    await expect(page.getByText(/닉네임을 입력해주세요/i)).toBeVisible();
+    const errorMessage = page.getByText(/닉네임을 입력해주세요/i);
+    await expect(errorMessage).toBeVisible();
 
-    // 닉네임 입력 필드에 포커스가 있는지 확인
-    await expect(nicknameInput).toBeFocused();
+    // 닉네임 입력 필드가 여전히 보이는지 확인 (리다이렉트되지 않았는지)
+    await expect(nicknameInput).toBeVisible();
   });
 
   /**

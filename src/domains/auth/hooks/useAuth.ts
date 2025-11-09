@@ -139,7 +139,10 @@ export function useAuth() {
               const parsed = JSON.parse(stored);
               setUser(parsed);
               setIsAuthenticated(true);
-              console.log("[useAuth] localStorage에서 사용자 정보 복원:", parsed);
+              console.log(
+                "[useAuth] localStorage에서 사용자 정보 복원:",
+                parsed
+              );
             } catch (error) {
               console.error("[useAuth] localStorage 파싱 실패:", error);
             }

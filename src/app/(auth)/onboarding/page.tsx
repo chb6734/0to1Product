@@ -14,7 +14,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function OnboardingPage() {
-  const { user, updateProfile, isLoading, error, isAuthenticated, isInitializing } = useAuth();
+  const {
+    user,
+    updateProfile,
+    isLoading,
+    error,
+    isAuthenticated,
+    isInitializing,
+  } = useAuth();
   const router = useRouter();
   const [nickname, setNickname] = useState("");
   const [profileImage, setProfileImage] = useState("");
