@@ -29,7 +29,7 @@ export default function Home() {
                   보관함
                 </Link>
                 <Link
-                  href="#"
+                  href="/discover"
                   className="text-base text-gray-400 hover:text-white transition-colors"
                 >
                   둘러보기
