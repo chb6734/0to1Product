@@ -23,7 +23,7 @@ export default function Home() {
               </div>
               <nav className="hidden md:flex items-center gap-6">
                 <Link
-                  href="#"
+                  href="/inbox"
                   className="text-base text-gray-400 hover:text-white transition-colors"
                 >
                   보관함
