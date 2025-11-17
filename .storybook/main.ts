@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/react-webpack5';
+import type { StorybookConfig } from '@storybook/react-vite';
 import * as path from 'path';
 
 const config: StorybookConfig = {
@@ -10,32 +10,30 @@ const config: StorybookConfig = {
     '@storybook/addon-docs',
   ],
   framework: {
-    name: '@storybook/react-webpack5',
+    name: '@storybook/react-vite',
     options: {},
   },
   typescript: {
-    reactDocgen: 'react-docgen',
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      propFilter: (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
+    },
     check: false,
   },
   docs: {
     autodocs: 'tag',
   },
-  webpackFinal: async (config) => {
-    // Storybook에서 Node.js 모듈 처리
-    if (config.resolve) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        crypto: false,
-      };
-      // Next.js 모듈을 Mock으로 대체
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        'next/link': path.resolve(__dirname, './mocks/next.js'),
-        'next/navigation': path.resolve(__dirname, './mocks/next.js'),
-      };
-    }
+  async viteFinal(config) {
+    // Next.js 모듈을 Mock으로 대체
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'next/link': path.resolve(__dirname, './mocks/next.js'),
+      'next/navigation': path.resolve(__dirname, './mocks/next.js'),
+      // tsconfig의 path alias 설정
+      '@': path.resolve(__dirname, '../src'),
+    };
     return config;
   },
 };
