@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Header } from "@/shared/components/layout/Header";
+import { Icon } from "@/shared/components/ui/Icon";
 
 export default function CreateLetterPage() {
   const [step, setStep] = useState<1 | 2>(1);
@@ -29,87 +30,11 @@ export default function CreateLetterPage() {
     console.log("[CreateLetterPage] 완료 버튼 클릭 (퍼블리싱 테스트용)");
   };
 
-  // 헤더
-  const Header = () => (
-    <header
-      className="sticky top-0 z-50"
-      style={{
-        backgroundColor: "rgba(18, 18, 18, 0.8)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded"
-                style={{ backgroundColor: "#FFE11D" }}
-              ></div>
-              <h1 className="text-lg font-bold text-white">FAN:STAGE</h1>
-            </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link
-                href="#"
-                className="text-base text-gray-400 hover:text-white transition-colors"
-              >
-                보관함
-              </Link>
-              <Link
-                href="#"
-                className="text-base text-gray-400 hover:text-white transition-colors"
-              >
-                둘러보기
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/create"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-medium text-base transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#FFE11D", color: "#000000" }}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 3.33V12.67M3.33 8H12.67"
-                  stroke="currentColor"
-                  strokeWidth="1.33"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              편지 만들기
-            </Link>
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
-              style={{
-                background:
-                  "linear-gradient(180deg, #FFE11D 0%, #2ADFFF 100%)",
-                color: "#000000",
-              }}
-            >
-              ME
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-
   // 첫 번째 단계: 편지 작성
   if (step === 1) {
     return (
-      <div
-        className="min-h-screen"
-        style={{ backgroundColor: "#0A0A0A" }}
-      >
-        <Header />
+      <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
+        <Header showCreateButton showProfile />
         <div className="max-w-7xl mx-auto px-8 py-12">
           {/* 헤딩 */}
           <div className="mb-8">
@@ -145,28 +70,12 @@ export default function CreateLetterPage() {
                       border: "1px solid rgba(255, 255, 255, 0.1)",
                     }}
                   />
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
+                  <Icon
+                    name="search"
+                    size={20}
+                    color="#6A7282"
                     className="absolute left-4 top-1/2 -translate-y-1/2"
-                    style={{ color: "#6A7282" }}
-                  >
-                    <circle
-                      cx="9"
-                      cy="9"
-                      r="6"
-                      stroke="currentColor"
-                      strokeWidth="1.67"
-                    />
-                    <path
-                      d="M13 13L17 17"
-                      stroke="currentColor"
-                      strokeWidth="1.67"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                  />
                 </div>
               </div>
 
@@ -225,7 +134,10 @@ export default function CreateLetterPage() {
                       border: "1px solid rgba(255, 255, 255, 0.1)",
                     }}
                   />
-                  <label htmlFor="private" className="flex items-center gap-2 cursor-pointer">
+                  <label
+                    htmlFor="private"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
                     <svg
                       width="16"
                       height="16"
@@ -241,7 +153,9 @@ export default function CreateLetterPage() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                    <span className="text-base text-white">링크만 공유 (비공개)</span>
+                    <span className="text-base text-white">
+                      링크만 공유 (비공개)
+                    </span>
                   </label>
                 </div>
                 <p className="text-sm ml-8" style={{ color: "#6A7282" }}>
@@ -275,23 +189,16 @@ export default function CreateLetterPage() {
               >
                 <h4 className="text-lg font-semibold text-white">미리보기</h4>
                 <div className="flex flex-col items-center justify-center py-12">
-                  <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 48 48"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={{ opacity: 0.5 }}
+                  <Icon
+                    name="music"
+                    size={48}
+                    color="#6A7282"
+                    className="opacity-50"
+                  />
+                  <p
+                    className="text-base text-center mt-4"
+                    style={{ color: "#6A7282" }}
                   >
-                    <path
-                      d="M8 28L8 32M24 4L24 36M40 28L40 32"
-                      stroke="#6A7282"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <p className="text-base text-center mt-4" style={{ color: "#6A7282" }}>
                     곡과 메시지를 추가하면 미리보기가 표시됩니다
                   </p>
                 </div>
@@ -305,20 +212,15 @@ export default function CreateLetterPage() {
 
   // 두 번째 단계: 완성 화면
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: "#0A0A0A" }}
-    >
-      <Header />
+    <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
+      <Header showCreateButton showProfile />
       <div className="max-w-3xl mx-auto px-8 py-12">
         {/* 헤딩 */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
             편지가 완성되었습니다!
           </h2>
-          <p className="text-base text-gray-400">
-            링크나 QR코드로 공유하세요
-          </p>
+          <p className="text-base text-gray-400">링크나 QR코드로 공유하세요</p>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -331,21 +233,7 @@ export default function CreateLetterPage() {
             }}
           >
             <div className="flex items-center gap-2">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8.33 1.72L8.33 10.78M1.71 7.5L8.33 1.72L14.95 7.5"
-                  stroke="#FFE11D"
-                  strokeWidth="1.67"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <Icon name="link" size={20} color="#FFE11D" />
               <h3 className="text-2xl font-semibold text-white">공유 링크</h3>
             </div>
             <div className="flex gap-2">
@@ -364,28 +252,7 @@ export default function CreateLetterPage() {
                 className="px-6 py-3 rounded-lg font-medium text-base transition-opacity hover:opacity-90 flex items-center gap-2"
                 style={{ backgroundColor: "#FFE11D", color: "#000000" }}
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <rect
-                    x="5.33"
-                    y="5.33"
-                    width="9.33"
-                    height="9.33"
-                    stroke="currentColor"
-                    strokeWidth="1.33"
-                  />
-                  <path
-                    d="M1.33 1.33L1.33 10.67M10.67 1.33L1.33 1.33L1.33 10.67"
-                    stroke="currentColor"
-                    strokeWidth="1.33"
-                    strokeLinecap="round"
-                  />
-                </svg>
+                <Icon name="copy" size={16} color="#000000" />
                 복사
               </button>
             </div>
@@ -400,20 +267,7 @@ export default function CreateLetterPage() {
             }}
           >
             <div className="flex items-center gap-2">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M2.5 2.5L2.5 4.17M13.33 2.5L13.33 4.17M2.5 13.33L2.5 15M13.33 13.33L13.33 15M17.5 17.5L17.5 17.51M5.83 5.83L5.83 5.84M2.5 10L2.51 10M10 2.5L10 2.51M10 13.33L10 13.34M13.33 10L13.34 10M17.5 10L17.5 10.01M10 16.67L10 16.68M16.67 10L16.68 10"
-                  stroke="#2ADFFF"
-                  strokeWidth="1.67"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <Icon name="qr-code" size={20} color="#2ADFFF" />
               <h3 className="text-2xl font-semibold text-white">QR 코드</h3>
             </div>
             <div className="flex justify-center py-8">
@@ -428,9 +282,10 @@ export default function CreateLetterPage() {
                     const isCorner =
                       (i < 8 && (i === 0 || i === 7)) ||
                       (i >= 56 && (i === 56 || i === 63)) ||
-                      (i % 8 === 0 || i % 8 === 7);
+                      i % 8 === 0 ||
+                      i % 8 === 7;
                     const isCenter = i >= 28 && i <= 35;
-                    const isBlack = isCorner || isCenter || (i % 3 === 0);
+                    const isBlack = isCorner || isCenter || i % 3 === 0;
                     return (
                       <div
                         key={i}
@@ -457,22 +312,11 @@ export default function CreateLetterPage() {
               border: "1px solid rgba(255, 255, 255, 0.05)",
             }}
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1.67 4.17L1.67 15.83M10 1.67L10 18.33M18.33 4.17L18.33 15.83M7.5 7.5L7.5 7.51"
-                stroke="#2ADFFF"
-                strokeWidth="1.67"
-                strokeLinecap="round"
-              />
-            </svg>
+            <Icon name="link" size={20} color="#2ADFFF" />
             <div className="flex-1">
-              <h4 className="text-lg font-semibold text-white mb-1">전체 공개</h4>
+              <h4 className="text-lg font-semibold text-white mb-1">
+                전체 공개
+              </h4>
               <p className="text-sm text-gray-400">
                 이 편지는 둘러보기 페이지에 표시됩니다
               </p>
@@ -505,4 +349,3 @@ export default function CreateLetterPage() {
     </div>
   );
 }
-

@@ -1,50 +1,10 @@
 import Link from "next/link";
+import { Header } from "@/shared/components/layout/Header";
 
 export default function Home() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
-      {/* 헤더 */}
-      <header
-        className="sticky top-0 z-50"
-        style={{
-          backgroundColor: "rgba(18, 18, 18, 0.8)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-8 h-8 rounded"
-                  style={{ backgroundColor: "#FFE11D" }}
-                ></div>
-                <h1 className="text-lg font-bold text-white">FAN:STAGE</h1>
-              </div>
-              <nav className="hidden md:flex items-center gap-6">
-                <Link
-                  href="/inbox"
-                  className="text-base text-gray-400 hover:text-white transition-colors"
-                >
-                  보관함
-                </Link>
-                <Link
-                  href="/discover"
-                  className="text-base text-gray-400 hover:text-white transition-colors"
-                >
-                  둘러보기
-                </Link>
-              </nav>
-            </div>
-            <Link
-              href="/login"
-              className="px-4 py-2 text-base text-white hover:opacity-80 transition-opacity"
-            >
-              로그인
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* 히어로 섹션 */}
       <section className="max-w-5xl mx-auto px-8 pt-12 pb-16">

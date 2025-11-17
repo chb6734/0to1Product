@@ -56,6 +56,7 @@ src/
 │   │
 │   ├── letter/                    # 편지 도메인
 │   │   ├── components/
+│   │   │   ├── LetterCard.tsx    # 편지 카드 컴포넌트 (재사용 가능)
 │   │   │   ├── LetterCreateForm.tsx
 │   │   │   ├── TrackSearch.tsx
 │   │   │   ├── TrackList.tsx
@@ -78,13 +79,16 @@ src/
 │
 ├── shared/                       # 공통 모듈
 │   ├── components/               # 공통 컴포넌트
-│   │   ├── ui/                   # shadcn/ui 컴포넌트
-│   │   │   ├── button.tsx
-│   │   │   ├── input.tsx
-│   │   │   └── card.tsx
+│   │   ├── ui/                   # UI 컴포넌트
+│   │   │   ├── Button.tsx        # 버튼 컴포넌트
+│   │   │   ├── Card.tsx          # 카드 컴포넌트
+│   │   │   ├── Input.tsx         # 입력 컴포넌트
+│   │   │   ├── Icon.tsx          # 아이콘 컴포넌트 (재사용 가능)
+│   │   │   ├── ProfileAvatar.tsx # 프로필 아바타 (일반)
+│   │   │   ├── ProfileAvatarGradient.tsx # 프로필 아바타 (그라데이션)
+│   │   │   └── EmptyState.tsx   # 빈 상태 컴포넌트
 │   │   └── layout/               # 레이아웃 컴포넌트
-│   │       ├── Header.tsx
-│   │       └── Footer.tsx
+│   │       └── Header.tsx        # 공통 헤더 (재사용 가능)
 │   ├── hooks/                     # 공통 훅
 │   │   └── useDebounce.ts
 │   ├── utils/                     # 공통 유틸리티
