@@ -14,7 +14,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
-    "msw:init": "msw init public/ --save"
+    "msw:init": "msw init public/ --save",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.0",
@@ -28,6 +30,13 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
+    "@storybook/addon-docs": "8.6.14",
+    "@storybook/addon-essentials": "8.6.14",
+    "@storybook/addon-interactions": "8.6.14",
+    "@storybook/addon-links": "8.6.14",
+    "@storybook/blocks": "8.6.14",
+    "@storybook/nextjs": "8.6.14",
+    "@storybook/react": "8.6.14",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.0",
@@ -42,6 +51,7 @@
     "jsdom": "^24.0.0",
     "msw": "^2.3.0",
     "postcss": "^8.4.0",
+    "storybook": "8.6.14",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.5.0",
     "vitest": "^1.6.0"
