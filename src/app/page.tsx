@@ -36,10 +36,11 @@ export default function Home() {
                 </Link>
               </nav>
             </div>
-            <Link href="/login">
-              <button className="px-4 py-2 text-base text-white hover:opacity-80 transition-opacity">
-                로그인
-              </button>
+            <Link
+              href="/login"
+              className="px-4 py-2 text-base text-white hover:opacity-80 transition-opacity"
+            >
+              로그인
             </Link>
           </div>
         </div>
@@ -84,28 +85,27 @@ export default function Home() {
 
           {/* 버튼 */}
           <div className="flex flex-wrap gap-4">
-            <Link href="/create">
-              <button
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+            <Link
+              href="/create"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M4.17 10L10 4.17M10 4.17L10 15.83M10 4.17L15.83 10"
-                    stroke="currentColor"
-                    strokeWidth="1.67"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                편지 만들기
-              </button>
+                <path
+                  d="M4.17 10L10 4.17M10 4.17L10 15.83M10 4.17L15.83 10"
+                  stroke="currentColor"
+                  strokeWidth="1.67"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              편지 만들기
             </Link>
             <button
               className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-normal text-base transition-opacity hover:opacity-80"
@@ -308,13 +308,12 @@ export default function Home() {
           <p className="text-xl text-gray-400 mb-8">
             수천 명의 뮤지션과 음악 애호가들이 함께하고 있습니다.
           </p>
-          <Link href="/create">
-            <button
-              className="inline-flex items-center justify-center px-10 py-4 rounded-full font-semibold text-lg transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#FFE11D", color: "#000000" }}
-            >
-              첫 편지 만들기
-            </button>
+          <Link
+            href="/create"
+            className="inline-flex items-center justify-center px-10 py-4 rounded-full font-semibold text-lg transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+          >
+            첫 편지 만들기
           </Link>
         </div>
       </section>
