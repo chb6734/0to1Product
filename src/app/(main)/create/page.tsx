@@ -1,221 +1,508 @@
-'use client'
+"use client";
 
-import { useLetter } from '@/domains/letter/hooks/useLetter'
-import { Button } from '@/shared/components/ui/Button'
-import { Input } from '@/shared/components/ui/Input'
-import { Card } from '@/shared/components/ui/Card'
-import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import Link from "next/link";
 
 export default function CreateLetterPage() {
-  const { letter, addTrack, removeTrack, setMessage, createLetter, isCreating, error, resetLetter } = useLetter()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const router = useRouter()
+  const [step, setStep] = useState<1 | 2>(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [message, setMessage] = useState("");
+  const [isPrivate, setIsPrivate] = useState(true);
+  const [letterLink] = useState("https://fanstage.com/l/abc123xyz");
 
-  const handleSearch = useCallback(async () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([])
-      return
-    }
+  const handleNext = () => {
+    console.log("[CreateLetterPage] 다음 버튼 클릭 (퍼블리싱 테스트용)");
+    setStep(2);
+  };
 
-    setIsSearching(true)
-    try {
-      const response = await fetch(`/api/music/search?q=${encodeURIComponent(searchQuery)}`)
-      const data = await response.json()
-      setSearchResults(data.tracks || [])
-    } catch (error) {
-      console.error('검색 실패:', error)
-    } finally {
-      setIsSearching(false)
-    }
-  }, [searchQuery])
+  const handleCopyLink = () => {
+    console.log("[CreateLetterPage] 링크 복사 (퍼블리싱 테스트용)");
+    navigator.clipboard.writeText(letterLink);
+  };
 
-  const handleTrackAdd = useCallback((track: any) => {
-    addTrack({
-      id: track.id,
-      title: track.title,
-      artist: track.artist,
-      albumCover: track.albumCover,
-    })
-    setSearchQuery('')
-    setSearchResults([])
-  }, [addTrack])
+  const handleEdit = () => {
+    console.log("[CreateLetterPage] 수정하기 버튼 클릭 (퍼블리싱 테스트용)");
+    setStep(1);
+  };
 
-  const handleSubmit = useCallback(async () => {
-    try {
-      const letterId = await createLetter()
-      router.push(`/letters/${letterId}`)
-    } catch (error) {
-      console.error('편지 생성 실패:', error)
-    }
-  }, [createLetter, router])
+  const handleComplete = () => {
+    console.log("[CreateLetterPage] 완료 버튼 클릭 (퍼블리싱 테스트용)");
+  };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-pink-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">편지 만들기</h1>
-          <p className="text-gray-600">음악과 메시지로 마음을 전해보세요</p>
-        </div>
-
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
-            {error.message}
+  // 헤더
+  const Header = () => (
+    <header
+      className="sticky top-0 z-50"
+      style={{
+        backgroundColor: "rgba(18, 18, 18, 0.8)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-8 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-2">
+              <div
+                className="w-8 h-8 rounded"
+                style={{ backgroundColor: "#FFE11D" }}
+              ></div>
+              <h1 className="text-lg font-bold text-white">FAN:STAGE</h1>
+            </Link>
+            <nav className="hidden md:flex items-center gap-6">
+              <Link
+                href="#"
+                className="text-base text-gray-400 hover:text-white transition-colors"
+              >
+                보관함
+              </Link>
+              <Link
+                href="#"
+                className="text-base text-gray-400 hover:text-white transition-colors"
+              >
+                둘러보기
+              </Link>
+            </nav>
           </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 왼쪽: 곡 검색 및 추가 */}
-          <div className="space-y-4">
-            <Card>
-              <h2 className="text-xl font-semibold mb-4">곡 검색</h2>
-              <div className="flex gap-2 mb-4">
-                <Input
-                  placeholder="곡 제목 또는 아티스트명 검색"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/create"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-medium text-base transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 3.33V12.67M3.33 8H12.67"
+                  stroke="currentColor"
+                  strokeWidth="1.33"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
-                <Button onClick={handleSearch} isLoading={isSearching}>
-                  검색
-                </Button>
-              </div>
-
-              {searchResults.length > 0 && (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {searchResults.map((track) => (
-                    <div
-                      key={track.id}
-                      className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleTrackAdd(track)}
-                    >
-                      <img
-                        src={track.albumCover}
-                        alt={track.title}
-                        className="w-12 h-12 rounded object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{track.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{track.artist}</p>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        추가
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-
-            {/* 추가된 곡 목록 */}
-            {letter.tracks.length > 0 && (
-              <Card>
-                <h2 className="text-xl font-semibold mb-4">추가된 곡 ({letter.tracks.length})</h2>
-                <div className="space-y-2">
-                  {letter.tracks.map((track, index) => (
-                    <div
-                      key={track.id}
-                      className="flex items-center gap-3 p-3 border rounded-lg"
-                    >
-                      <span className="text-gray-400 text-sm">{index + 1}</span>
-                      <img
-                        src={track.albumCover}
-                        alt={track.title}
-                        className="w-10 h-10 rounded object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{track.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{track.artist}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeTrack(track.id)}
-                      >
-                        삭제
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-          </div>
-
-          {/* 오른쪽: 메시지 작성 및 미리보기 */}
-          <div className="space-y-4">
-            <Card>
-              <h2 className="text-xl font-semibold mb-4">메시지 작성</h2>
-              <textarea
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                rows={6}
-                placeholder="메시지를 입력하세요 (최대 500자)"
-                value={letter.message}
-                onChange={(e) => setMessage(e.target.value)}
-                maxLength={500}
-              />
-              <p className="mt-2 text-sm text-gray-500 text-right">
-                {letter.message.length}/500
-              </p>
-            </Card>
-
-            {/* 미리보기 */}
-            <Card>
-              <h2 className="text-xl font-semibold mb-4">미리보기</h2>
-              {letter.tracks.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">곡을 추가해주세요</p>
-              ) : (
-                <div className="space-y-4">
-                  {letter.message && (
-                    <div className="p-4 bg-indigo-50 rounded-lg">
-                      <p className="text-gray-700 whitespace-pre-wrap">{letter.message}</p>
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    {letter.tracks.map((track, index) => (
-                      <div key={track.id} className="flex items-center gap-3 p-2 border rounded">
-                        <span className="text-gray-400 text-xs">{index + 1}</span>
-                        <img
-                          src={track.albumCover}
-                          alt={track.title}
-                          className="w-8 h-8 rounded object-cover"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{track.title}</p>
-                          <p className="text-xs text-gray-500 truncate">{track.artist}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </Card>
-
-            {/* 액션 버튼 */}
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={resetLetter}
-                disabled={isCreating}
-              >
-                초기화
-              </Button>
-              <Button
-                variant="primary"
-                className="flex-1"
-                onClick={handleSubmit}
-                isLoading={isCreating}
-                disabled={isCreating || letter.tracks.length === 0}
-              >
-                편지 완성
-              </Button>
+              </svg>
+              편지 만들기
+            </Link>
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
+              style={{
+                background:
+                  "linear-gradient(180deg, #FFE11D 0%, #2ADFFF 100%)",
+                color: "#000000",
+              }}
+            >
+              ME
             </div>
           </div>
         </div>
       </div>
+    </header>
+  );
+
+  // 첫 번째 단계: 편지 작성
+  if (step === 1) {
+    return (
+      <div
+        className="min-h-screen"
+        style={{ backgroundColor: "#0A0A0A" }}
+      >
+        <Header />
+        <div className="max-w-7xl mx-auto px-8 py-12">
+          {/* 헤딩 */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">
+              음악 편지 만들기
+            </h2>
+            <p className="text-base text-gray-400">
+              곡을 추가하고 메시지를 작성하세요
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 왼쪽: 입력 폼 */}
+            <div className="flex flex-col gap-6">
+              {/* 곡 추가 카드 */}
+              <div
+                className="rounded-2xl p-6 flex flex-col gap-4"
+                style={{
+                  backgroundColor: "#121212",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                }}
+              >
+                <h3 className="text-2xl font-semibold text-white">곡 추가</h3>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="곡, 아티스트, 앨범 검색..."
+                    className="w-full px-12 py-3 rounded-lg text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+                    style={{
+                      backgroundColor: "#1A1A1A",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  />
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="absolute left-4 top-1/2 -translate-y-1/2"
+                    style={{ color: "#6A7282" }}
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="6"
+                      stroke="currentColor"
+                      strokeWidth="1.67"
+                    />
+                    <path
+                      d="M13 13L17 17"
+                      stroke="currentColor"
+                      strokeWidth="1.67"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* 메시지 카드 */}
+              <div
+                className="rounded-2xl p-6 flex flex-col gap-4"
+                style={{
+                  backgroundColor: "#121212",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                }}
+              >
+                <h3 className="text-2xl font-semibold text-white">메시지</h3>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="음악과 함께 전할 메시지를 작성하세요..."
+                  maxLength={500}
+                  rows={6}
+                  className="w-full px-4 py-3 rounded-lg text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent resize-none"
+                  style={{
+                    backgroundColor: "#1A1A1A",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                  }}
+                />
+                <div className="flex items-center justify-between">
+                  <p className="text-sm" style={{ color: "#6A7282" }}>
+                    {message.length}/500
+                  </p>
+                  <button
+                    className="text-sm transition-colors hover:opacity-80"
+                    style={{ color: "#2ADFFF" }}
+                  >
+                    템플릿 사용
+                  </button>
+                </div>
+              </div>
+
+              {/* 공개 설정 카드 */}
+              <div
+                className="rounded-2xl p-6 flex flex-col gap-4"
+                style={{
+                  backgroundColor: "#121212",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                }}
+              >
+                <h3 className="text-2xl font-semibold text-white">공개 설정</h3>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="private"
+                    checked={isPrivate}
+                    onChange={(e) => setIsPrivate(e.target.checked)}
+                    className="w-5 h-5 rounded"
+                    style={{
+                      backgroundColor: "#1A1A1A",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  />
+                  <label htmlFor="private" className="flex items-center gap-2 cursor-pointer">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.33 1.72L8.33 10.78M1.71 7.5L8.33 1.72L14.95 7.5"
+                        stroke="#99A1AF"
+                        strokeWidth="1.67"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <span className="text-base text-white">링크만 공유 (비공개)</span>
+                  </label>
+                </div>
+                <p className="text-sm ml-8" style={{ color: "#6A7282" }}>
+                  링크를 가진 사람만 이 편지를 볼 수 있습니다.
+                </p>
+              </div>
+
+              {/* 다음 버튼 */}
+              <button
+                onClick={handleNext}
+                disabled={!message.trim()}
+                className="w-full h-12 rounded-lg font-medium text-base transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "#FFE11D",
+                  color: "#000000",
+                  opacity: !message.trim() ? 0.5 : 1,
+                }}
+              >
+                다음
+              </button>
+            </div>
+
+            {/* 오른쪽: 미리보기 */}
+            <div>
+              <div
+                className="rounded-2xl p-6 flex flex-col gap-4"
+                style={{
+                  backgroundColor: "#121212",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                }}
+              >
+                <h4 className="text-lg font-semibold text-white">미리보기</h4>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{ opacity: 0.5 }}
+                  >
+                    <path
+                      d="M8 28L8 32M24 4L24 36M40 28L40 32"
+                      stroke="#6A7282"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <p className="text-base text-center mt-4" style={{ color: "#6A7282" }}>
+                    곡과 메시지를 추가하면 미리보기가 표시됩니다
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 두 번째 단계: 완성 화면
+  return (
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: "#0A0A0A" }}
+    >
+      <Header />
+      <div className="max-w-3xl mx-auto px-8 py-12">
+        {/* 헤딩 */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            편지가 완성되었습니다!
+          </h2>
+          <p className="text-base text-gray-400">
+            링크나 QR코드로 공유하세요
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          {/* 공유 링크 카드 */}
+          <div
+            className="rounded-2xl p-6 flex flex-col gap-4"
+            style={{
+              backgroundColor: "#121212",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.33 1.72L8.33 10.78M1.71 7.5L8.33 1.72L14.95 7.5"
+                  stroke="#FFE11D"
+                  strokeWidth="1.67"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <h3 className="text-2xl font-semibold text-white">공유 링크</h3>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={letterLink}
+                readOnly
+                className="flex-1 px-4 py-3 rounded-lg text-base text-white focus:outline-none"
+                style={{
+                  backgroundColor: "#1A1A1A",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                }}
+              />
+              <button
+                onClick={handleCopyLink}
+                className="px-6 py-3 rounded-lg font-medium text-base transition-opacity hover:opacity-90 flex items-center gap-2"
+                style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    x="5.33"
+                    y="5.33"
+                    width="9.33"
+                    height="9.33"
+                    stroke="currentColor"
+                    strokeWidth="1.33"
+                  />
+                  <path
+                    d="M1.33 1.33L1.33 10.67M10.67 1.33L1.33 1.33L1.33 10.67"
+                    stroke="currentColor"
+                    strokeWidth="1.33"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                복사
+              </button>
+            </div>
+          </div>
+
+          {/* QR 코드 카드 */}
+          <div
+            className="rounded-2xl p-6 flex flex-col gap-4"
+            style={{
+              backgroundColor: "#121212",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.5 2.5L2.5 4.17M13.33 2.5L13.33 4.17M2.5 13.33L2.5 15M13.33 13.33L13.33 15M17.5 17.5L17.5 17.51M5.83 5.83L5.83 5.84M2.5 10L2.51 10M10 2.5L10 2.51M10 13.33L10 13.34M13.33 10L13.34 10M17.5 10L17.5 10.01M10 16.67L10 16.68M16.67 10L16.68 10"
+                  stroke="#2ADFFF"
+                  strokeWidth="1.67"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <h3 className="text-2xl font-semibold text-white">QR 코드</h3>
+            </div>
+            <div className="flex justify-center py-8">
+              <div
+                className="w-64 h-64 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#FFFFFF" }}
+              >
+                {/* QR 코드 플레이스홀더 */}
+                <div className="grid grid-cols-8 gap-1">
+                  {Array.from({ length: 64 }).map((_, i) => {
+                    // 고정된 QR 코드 패턴 (모서리와 중앙 패턴)
+                    const isCorner =
+                      (i < 8 && (i === 0 || i === 7)) ||
+                      (i >= 56 && (i === 56 || i === 63)) ||
+                      (i % 8 === 0 || i % 8 === 7);
+                    const isCenter = i >= 28 && i <= 35;
+                    const isBlack = isCorner || isCenter || (i % 3 === 0);
+                    return (
+                      <div
+                        key={i}
+                        className="w-2 h-2 rounded-sm"
+                        style={{
+                          backgroundColor: isBlack ? "#000000" : "#FFFFFF",
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-center" style={{ color: "#6A7282" }}>
+              QR 코드를 스캔하면 편지로 바로 이동합니다
+            </p>
+          </div>
+
+          {/* 전체 공개 카드 */}
+          <div
+            className="rounded-2xl p-6 flex items-center gap-3"
+            style={{
+              backgroundColor: "#121212",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1.67 4.17L1.67 15.83M10 1.67L10 18.33M18.33 4.17L18.33 15.83M7.5 7.5L7.5 7.51"
+                stroke="#2ADFFF"
+                strokeWidth="1.67"
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="flex-1">
+              <h4 className="text-lg font-semibold text-white mb-1">전체 공개</h4>
+              <p className="text-sm text-gray-400">
+                이 편지는 둘러보기 페이지에 표시됩니다
+              </p>
+            </div>
+          </div>
+
+          {/* 액션 버튼 */}
+          <div className="flex gap-3">
+            <button
+              onClick={handleEdit}
+              className="flex-1 h-12 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                color: "#FFFFFF",
+              }}
+            >
+              수정하기
+            </button>
+            <button
+              onClick={handleComplete}
+              className="flex-1 h-12 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#10B981", color: "#FFFFFF" }}
+            >
+              완료
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
