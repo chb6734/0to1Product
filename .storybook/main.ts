@@ -1,4 +1,5 @@
-import type { StorybookConfig } from '@storybook/nextjs';
+import type { StorybookConfig } from '@storybook/react-webpack5';
+import * as path from 'path';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx|mdx)'],
@@ -9,7 +10,7 @@ const config: StorybookConfig = {
     '@storybook/addon-docs',
   ],
   framework: {
-    name: '@storybook/nextjs',
+    name: '@storybook/react-webpack5',
     options: {},
   },
   typescript: {
@@ -20,13 +21,19 @@ const config: StorybookConfig = {
     autodocs: 'tag',
   },
   webpackFinal: async (config) => {
-    // Storybook에서 Next.js webpack 설정과의 충돌 해결
+    // Storybook에서 Node.js 모듈 처리
     if (config.resolve) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         path: false,
         crypto: false,
+      };
+      // Next.js 모듈을 Mock으로 대체
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'next/link': path.resolve(__dirname, './mocks/next.js'),
+        'next/navigation': path.resolve(__dirname, './mocks/next.js'),
       };
     }
     return config;
