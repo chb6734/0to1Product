@@ -156,6 +156,42 @@ Page Component (App Router)
 2. **Composition over Props Drilling**: Props Drilling 대신 Composition 사용
 3. **컴포넌트 분리**: 조건부 렌더링이 복잡하면 별도 컴포넌트로 분리
 4. **재사용성**: 공통 컴포넌트는 `shared/components`에 배치
+5. **도메인 컴포넌트**: 도메인별 컴포넌트는 `domains/{domain}/components`에 배치
+
+### 구현된 재사용 가능한 컴포넌트
+
+#### Layout 컴포넌트
+- **Header** (`shared/components/layout/Header.tsx`)
+  - Props: `activeNav`, `showCreateButton`, `showProfile`
+  - 사용처: 모든 페이지 (랜딩, 로그인, 온보딩, 편지 생성, 보관함, 둘러보기, 편지 상세)
+  - 특징: 조건부 렌더링으로 다양한 상황에 대응
+
+#### UI 컴포넌트
+- **Icon** (`shared/components/ui/Icon.tsx`)
+  - Props: `name`, `size`, `className`, `color`
+  - 사용처: 모든 페이지
+  - 특징: SVG 아이콘을 컴포넌트로 추상화하여 일관성 보장
+
+- **ProfileAvatar** (`shared/components/ui/ProfileAvatar.tsx`)
+  - Props: `initials`, `size`, `className`
+  - 사용처: 편지 카드, 프로필 표시
+  - 특징: 일반 아바타 (노란색 배경)
+
+- **ProfileAvatarGradient** (`shared/components/ui/ProfileAvatarGradient.tsx`)
+  - Props: `initials`, `size`, `className`
+  - 사용처: 편지 상세, 프로필 표시
+  - 특징: 그라데이션 아바타 (노란색 → 시안색)
+
+- **EmptyState** (`shared/components/ui/EmptyState.tsx`)
+  - Props: `icon`, `message`, `className`
+  - 사용처: 빈 상태 표시 (보관함 등)
+  - 특징: 일관된 빈 상태 UI
+
+#### 도메인 컴포넌트
+- **LetterCard** (`domains/letter/components/LetterCard.tsx`)
+  - Props: `sender`, `recipient`, `senderInitials`, `recipientInitials`, `title`, `message`, `trackCount`, `playCount`, `likeCount`, `date`, `onClick`
+  - 사용처: 보관함 (받은 편지/보낸 편지), 둘러보기
+  - 특징: 받은 편지, 보낸 편지, 둘러보기에서 공통 사용 가능
 
 ---
 
