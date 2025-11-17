@@ -1,166 +1,117 @@
 "use client";
 
-/**
- * 온보딩 페이지
- *
- * 목적: 신규 사용자의 닉네임 및 프로필 이미지 설정
- * 시나리오: TC-AUTH-001, TC-AUTH-002, TC-AUTH-003
- */
 import { useState } from "react";
-import { useAuth } from "@/domains/auth/hooks/useAuth";
-import { Button } from "@/shared/components/ui/Button";
-import { Input } from "@/shared/components/ui/Input";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function OnboardingPage() {
-  const {
-    user,
-    updateProfile,
-    isLoading,
-    error,
-    isAuthenticated,
-    isInitializing,
-  } = useAuth();
-  const router = useRouter();
   const [nickname, setNickname] = useState("");
-  const [profileImage, setProfileImage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
 
-  // 초기화 중이면 대기
-  useEffect(() => {
-    if (isInitializing) return;
-
-    // 로그인하지 않은 사용자는 로그인 페이지로 리다이렉트
-    if (!isAuthenticated) {
-      router.replace("/login");
-      return;
-    }
-    // 이미 닉네임이 있으면 메인 페이지로 리다이렉트
-    if (user?.nickname) {
-      router.replace("/");
-      return;
-    }
-  }, [isAuthenticated, user, router, isInitializing]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationError(null);
-
-    // 닉네임 검증
-    if (!nickname.trim()) {
-      setValidationError("닉네임을 입력해주세요");
-      return;
-    }
-
-    if (nickname.length > 20) {
-      setValidationError("닉네임은 최대 20자까지 입력 가능합니다");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await updateProfile({
-        nickname: nickname.trim(),
-        profileImage: profileImage.trim() || undefined,
-      });
-      // 프로필 업데이트 성공 시 메인 페이지로 리다이렉트
-      router.replace("/");
-    } catch (error) {
-      // 에러는 useAuth의 error state로 처리됨
-      console.error("프로필 업데이트 실패:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    console.log("[OnboardingPage] 시작하기 버튼 클릭 (퍼블리싱 테스트용)");
+    // 퍼블리싱 테스트를 위해 실제 제출 로직 제거
   };
 
-  if (isInitializing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-pink-50 px-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || user?.nickname) {
-    return null; // 리다이렉트 중
-  }
+  const isButtonDisabled = !nickname.trim();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-pink-50 px-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">FAN:STAGE</h1>
-          <p className="text-gray-600">프로필을 설정해주세요</p>
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-32"
+      style={{ backgroundColor: "#0A0A0A" }}
+    >
+      <div className="max-w-md w-full flex flex-col gap-8">
+        {/* 헤딩 */}
+        <div className="text-center">
+          <h1 className="text-5xl font-bold text-white mb-2 leading-tight">
+            프로필 설정
+          </h1>
+          <p className="text-base text-gray-400">
+            닉네임과 프로필 사진을 설정해주세요
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-semibold text-center mb-6">
-            프로필 설정
-          </h2>
-
-          {(error || validationError) && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-              {validationError || error?.message}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Input
-                label="닉네임"
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="닉네임을 입력하세요 (최대 20자)"
-                maxLength={20}
-                required
-                autoFocus
-              />
-              <p className="mt-1 text-xs text-gray-500">{nickname.length}/20</p>
-            </div>
-
-            <div>
-              <Input
-                label="프로필 이미지 URL (선택)"
-                type="url"
-                value={profileImage}
-                onChange={(e) => setProfileImage(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                프로필 이미지 URL을 입력하거나 나중에 설정할 수 있습니다
-              </p>
-            </div>
-
-            {profileImage && (
-              <div className="flex justify-center">
-                <img
-                  src={profileImage}
-                  alt="프로필 미리보기"
-                  className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
+        {/* 폼 카드 */}
+        <div
+          className="rounded-2xl p-8 flex flex-col gap-6"
+          style={{
+            backgroundColor: "#121212",
+            border: "1px solid rgba(255, 255, 255, 0.05)",
+          }}
+        >
+          {/* 프로필 사진 업로드 */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              {/* 프로필 사진 원형 배경 */}
+              <div
+                className="w-24 h-24 rounded-full flex items-center justify-center relative"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #FFE11D 0%, #2ADFFF 100%)",
+                }}
+              >
+                <span className="text-3xl font-bold text-black">?</span>
+                {/* 업로드 버튼 */}
+                <button
+                  type="button"
+                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "#FFE11D" }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 3.33V12.67M3.33 8H12.67"
+                      stroke="#000000"
+                      strokeWidth="1.33"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
               </div>
-            )}
+            </div>
+            <p className="text-sm text-gray-400">프로필 사진 (선택)</p>
+          </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              isLoading={isSubmitting || isLoading}
-              disabled={isSubmitting || isLoading}
-            >
-              완료
-            </Button>
-          </form>
+          {/* 닉네임 입력 */}
+          <div className="flex flex-col gap-2">
+            <label className="text-base text-white">
+              닉네임 <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="닉네임을 입력하세요"
+              maxLength={20}
+              className="w-full px-4 py-3 rounded-lg text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+              style={{
+                backgroundColor: "#1A1A1A",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+              }}
+            />
+            <p className="text-sm" style={{ color: "#6A7282" }}>
+              {nickname.length}/20
+            </p>
+          </div>
+
+          {/* 시작하기 버튼 */}
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={isButtonDisabled}
+            className="w-full h-12 rounded-lg font-medium text-base transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "#FFE11D",
+              color: "#000000",
+              opacity: isButtonDisabled ? 0.5 : 1,
+            }}
+          >
+            시작하기
+          </button>
         </div>
       </div>
     </div>
