@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 // Next.js 컴포넌트를 Storybook에서 사용하기 위한 Mock
 // Storybook에서는 Next.js의 서버 사이드 기능이 필요 없으므로 클라이언트 컴포넌트로 처리
 
-export const Link = React.forwardRef(
+const Link = React.forwardRef(
   ({ href, children, className, ...props }, ref) => {
     return (
       <a ref={ref} href={href} className={className} {...props}>
@@ -13,15 +13,18 @@ export const Link = React.forwardRef(
   }
 );
 
-Link.displayName = 'Link';
+Link.displayName = "Link";
+
+// Next.js의 Link는 default export이므로 default export 추가
+export default Link;
+export { Link };
 
 export const useRouter = () => ({
-  push: (url) => console.log('Navigate to:', url),
-  back: () => console.log('Navigate back'),
-  pathname: '/',
+  push: (url) => console.log("Navigate to:", url),
+  back: () => console.log("Navigate back"),
+  pathname: "/",
   query: {},
-  asPath: '/',
+  asPath: "/",
 });
 
-export const usePathname = () => '/';
-
+export const usePathname = () => "/";
