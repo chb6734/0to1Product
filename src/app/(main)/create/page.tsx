@@ -295,6 +295,13 @@ export default function CreateLetterPage() {
     }
   }, [demoMode]);
 
+  // 편지 데이터 로드 시 이미지 미리보기 설정
+  useEffect(() => {
+    if (letter.imageUrl && !imagePreview) {
+      setImagePreview(letter.imageUrl);
+    }
+  }, [letter.imageUrl, imagePreview]);
+
   // 자동완성 제안 생성
   useEffect(() => {
     if (searchQuery.length >= 2 && searchResults.length > 0) {
