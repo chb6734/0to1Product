@@ -136,7 +136,7 @@ const authHandlers = [
 const letterHandlers = [
   http.get('/api/letters', ({ request }) => {
     const url = new URL(request.url)
-    const type = url.searchParams.get('type') // 'received' 또는 'sent'
+    const type = url.searchParams.get('type') // 'received', 'sent', 또는 'discover'
     
     // 현재 사용자 정보 가져오기
     // 실제 환경에서는 요청 헤더나 쿠키에서 사용자 정보를 가져와야 함
@@ -157,6 +157,10 @@ const letterHandlers = [
       filteredLetters = mockLetters.filter(letter => 
         letter.recipientEmail === currentUserEmail && letter.senderId !== currentUserId
       )
+    } else if (type === 'discover') {
+      // 둘러보기: 공개된 편지 목록 (현재는 모든 편지, 향후 공개 설정된 편지만 필터링)
+      // 현재 사용자가 보낸 편지는 제외하고, 다른 사용자가 보낸 편지만 표시
+      filteredLetters = mockLetters.filter(letter => letter.senderId !== currentUserId)
     }
     
     return HttpResponse.json({ letters: filteredLetters })
