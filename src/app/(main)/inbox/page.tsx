@@ -1,52 +1,124 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/shared/components/layout/Header";
 import { LetterCard } from "@/domains/letter/components/LetterCard";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
+import { useAuth } from "@/domains/auth/hooks/useAuth";
+import {
+  loadDemoLetter,
+  migrateDemoLetterToServer,
+} from "@/shared/utils/demoMode";
+import { useLetter } from "@/domains/letter/hooks/useLetter";
 
 export default function InboxPage() {
   const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
+  const { user, isAuthenticated } = useAuth();
+  const { createLetter } = useLetter();
+  const [letters, setLetters] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 받은 편지 목록 (예시 데이터)
-  const receivedLetters = [
-    {
-      id: 1,
-      sender: "김서연",
-      senderInitials: "KS",
-      message: "생일 축하해! 이 노래들 들으면서...",
-      trackCount: 8,
-      playCount: 245,
-      likeCount: 45,
-      date: "2일 전",
-    },
-    {
-      id: 2,
-      sender: "이준호",
-      senderInitials: "LJ",
-      message: "요즘 듣고 있는 플레이리스트 공유!",
-      trackCount: 12,
-      playCount: 189,
-      likeCount: 32,
-      date: "5일 전",
-    },
-  ];
+  // 데모 모드 편지 마이그레이션
+  useEffect(() => {
+    const migrateDemoLetter = async () => {
+      if (!isAuthenticated || !user) return;
 
-  // 보낸 편지 목록 (예시 데이터)
-  const sentLetters = [
-    {
-      id: 3,
-      recipient: "박민수",
-      recipientInitials: "PM",
-      message: "이번 주말에 들을 곡들 추천해줄게",
-      trackCount: 10,
-      playCount: 156,
-      likeCount: 28,
-      date: "1일 전",
-    },
-  ];
+      const demoData = loadDemoLetter();
+      if (!demoData) return;
 
-  const letters = activeTab === "received" ? receivedLetters : sentLetters;
+      try {
+        await migrateDemoLetterToServer(async (data) => {
+          const response = await fetch("/api/letters", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tracks: data.tracks,
+              message: data.message,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("편지 마이그레이션 실패");
+          }
+
+          const result = await response.json();
+          return { id: result.id || result.letter?.id };
+        });
+      } catch (error) {
+        console.error("데모 모드 편지 마이그레이션 실패:", error);
+      }
+    };
+
+    migrateDemoLetter();
+  }, [isAuthenticated, user]);
+
+  // 편지 목록 로드
+  useEffect(() => {
+    const loadLetters = async () => {
+      setIsLoading(true);
+      try {
+        const type = activeTab === "received" ? "received" : "sent";
+        const response = await fetch(`/api/letters?type=${type}`);
+        if (response.ok) {
+          const data = await response.json();
+          setLetters(data.letters || []);
+        } else {
+          // API 실패 시 데모 모드 편지 표시 (보낸 편지 탭에서만)
+          if (activeTab === "sent") {
+            const demoData = loadDemoLetter();
+            if (demoData) {
+              setLetters([
+                {
+                  id: "demo-letter",
+                  recipient: "데모 편지",
+                  recipientInitials: "DM",
+                  message: demoData.message,
+                  trackCount: demoData.tracks.length,
+                  playCount: 0,
+                  likeCount: 0,
+                  date: "방금",
+                },
+              ]);
+            } else {
+              setLetters([]);
+            }
+          } else {
+            setLetters([]);
+          }
+        }
+      } catch (error) {
+        console.error("편지 목록 로드 실패:", error);
+        // 에러 시 데모 모드 편지 표시 (보낸 편지 탭에서만)
+        if (activeTab === "sent") {
+          const demoData = loadDemoLetter();
+          if (demoData) {
+            setLetters([
+              {
+                id: "demo-letter",
+                recipient: "데모 편지",
+                recipientInitials: "DM",
+                message: demoData.message,
+                trackCount: demoData.tracks.length,
+                playCount: 0,
+                likeCount: 0,
+                date: "방금",
+              },
+            ]);
+          } else {
+            setLetters([]);
+          }
+        } else {
+          setLetters([]);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadLetters();
+  }, [activeTab]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>

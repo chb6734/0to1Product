@@ -47,6 +47,7 @@ export default function Home() {
           <div className="flex flex-wrap gap-4">
             <Link
               href="/create?demo=true"
+              role="button"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
               style={{ backgroundColor: "#FFE11D", color: "#000000" }}
             >
