@@ -26,17 +26,27 @@ export default function OnboardingPage() {
     try {
       // 프로필 업데이트 (닉네임)
       await updateProfile({ nickname: nickname.trim() });
+      console.log("[OnboardingPage] 프로필 업데이트 완료");
 
       // 기본 플랫폼 설정 (선택적)
       if (defaultPlatform) {
-        await setDefaultPlatform(defaultPlatform);
+        try {
+          await setDefaultPlatform(defaultPlatform);
+          console.log("[OnboardingPage] 기본 플랫폼 설정 완료:", defaultPlatform);
+        } catch (platformError) {
+          console.error("[OnboardingPage] 기본 플랫폼 설정 실패:", platformError);
+          // 기본 플랫폼 설정 실패해도 계속 진행
+        }
       }
 
       // 보관함으로 이동
+      console.log("[OnboardingPage] 보관함으로 이동");
       router.push("/inbox");
     } catch (error) {
-      console.error("온보딩 실패:", error);
+      console.error("[OnboardingPage] 온보딩 실패:", error);
       setIsSubmitting(false);
+      // 에러 발생 시에도 사용자에게 알림 (추후 토스트 메시지 추가 가능)
+      alert("프로필 설정에 실패했습니다. 다시 시도해주세요.");
     }
   };
 

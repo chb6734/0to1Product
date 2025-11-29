@@ -113,15 +113,31 @@ const authHandlers = [
     return HttpResponse.json({ user: updatedUser })
   }),
 
-  // 기본 플랫폼 설정 (프로필 수정의 일부이지만 명시적으로 추가)
+  // 프로필 업데이트 (nickname, profileImage, defaultPlatform 모두 처리)
   http.put('/api/auth/profile', async ({ request }) => {
     await delay(400)
-    const body = await request.json() as { defaultPlatform?: string }
+    const body = await request.json() as { 
+      nickname?: string
+      profileImage?: string
+      defaultPlatform?: string 
+    }
+    
+    // 현재 사용자 정보 가져오기 (localStorage에서 가져온다고 가정)
+    const currentUser = mockUsers[0]
+    
     const updatedUser = {
-      ...mockUsers[0],
-      defaultPlatform: body.defaultPlatform || null,
+      ...currentUser,
+      nickname: body.nickname !== undefined ? body.nickname : currentUser.nickname,
+      profileImage: body.profileImage !== undefined ? body.profileImage : currentUser.profileImage,
+      defaultPlatform: body.defaultPlatform !== undefined ? (body.defaultPlatform as 'spotify' | 'apple' | 'youtube' | 'melon' | null) : currentUser.defaultPlatform,
       updatedAt: new Date().toISOString(),
     }
+    
+    // mockUsers 업데이트 (실제로는 DB 업데이트)
+    if (mockUsers[0]) {
+      mockUsers[0] = updatedUser as typeof mockUsers[0]
+    }
+    
     return HttpResponse.json({ user: updatedUser })
   }),
 ]
