@@ -18,6 +18,7 @@ import {
   type FilterOptions,
 } from "@/shared/utils/sortFilter";
 import { Icon } from "@/shared/components/ui/Icon";
+import { formatDateToKorean } from "@/shared/utils/dateFormat";
 
 export default function InboxPage() {
   const router = useRouter();
@@ -467,6 +468,11 @@ export default function InboxPage() {
                   ""
                 : letter.recipientInitials || "";
 
+            // 날짜 포맷팅 (보낸 편지는 년월일 형식, 받은 편지는 상대적 형식 유지)
+            const formattedDate = activeTab === "sent"
+              ? formatDateToKorean(letter.createdAt || letter.date || new Date().toISOString())
+              : letter.date || formatDateToKorean(letter.createdAt || new Date().toISOString());
+
             // 편지 ID 확인
             const letterId = letter.id;
             if (!letterId) {
@@ -484,7 +490,7 @@ export default function InboxPage() {
                 trackCount={letter.trackCount || letter.tracks?.length || 0}
                 playCount={letter.playCount || 0}
                 likeCount={letter.likeCount || 0}
-                date={letter.date || letter.createdAt || ""}
+                date={formattedDate}
                 onClick={() => {
                   const id = letter.id;
                   if (id && id !== "demo-letter") {

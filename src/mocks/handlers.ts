@@ -136,8 +136,25 @@ const authHandlers = [
 const letterHandlers = [
   http.get('/api/letters', ({ request }) => {
     const url = new URL(request.url)
-    const type = url.searchParams.get('type')
-    return HttpResponse.json({ letters: mockLetters })
+    const type = url.searchParams.get('type') // 'received' 또는 'sent'
+    
+    // 현재 사용자 정보 가져오기 (localStorage에서 가져온다고 가정)
+    // 실제로는 요청 헤더나 쿠키에서 사용자 정보를 가져와야 함
+    // 여기서는 mockUsers[0]을 현재 사용자로 가정
+    const currentUserId = mockUsers[0]?.id
+    const currentUserEmail = mockUsers[0]?.email
+    
+    let filteredLetters = mockLetters
+    
+    if (type === 'sent') {
+      // 보낸 편지: senderId가 현재 사용자 ID와 일치하는 편지
+      filteredLetters = mockLetters.filter(letter => letter.senderId === currentUserId)
+    } else if (type === 'received') {
+      // 받은 편지: recipientEmail이 현재 사용자 이메일과 일치하는 편지
+      filteredLetters = mockLetters.filter(letter => letter.recipientEmail === currentUserEmail)
+    }
+    
+    return HttpResponse.json({ letters: filteredLetters })
   }),
 
   http.post('/api/letters', async ({ request }) => {
