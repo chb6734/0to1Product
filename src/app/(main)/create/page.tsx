@@ -438,6 +438,74 @@ export default function CreateLetterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 왼쪽: 입력 폼 */}
           <div className="flex flex-col gap-6">
+            {/* 이미지 업로드 카드 */}
+            <div
+              className="rounded-2xl p-6 flex flex-col gap-4"
+              style={{
+                backgroundColor: "#121212",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
+              }}
+            >
+              <h3 className="text-2xl font-semibold text-white">이미지 추가 (선택)</h3>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                id="image-upload"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      await setImage(file, demoMode);
+                      const preview = URL.createObjectURL(file);
+                      setImagePreview(preview);
+                    } catch (error) {
+                      console.error("이미지 업로드 실패:", error);
+                      alert(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.");
+                    }
+                  }
+                }}
+              />
+              {letter.imageUrl || imagePreview ? (
+                <div className="relative">
+                  <img
+                    src={imagePreview || letter.imageUrl}
+                    alt="편지 이미지 미리보기"
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={() => {
+                      removeImage();
+                      setImagePreview(null);
+                      const input = document.getElementById("image-upload") as HTMLInputElement;
+                      if (input) input.value = "";
+                    }}
+                    className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", color: "#FFFFFF" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <label
+                  htmlFor="image-upload"
+                  className="flex flex-col items-center justify-center gap-3 p-8 rounded-lg border-2 border-dashed cursor-pointer transition-opacity hover:opacity-80"
+                  style={{
+                    borderColor: "rgba(255, 255, 255, 0.2)",
+                    backgroundColor: "#1A1A1A",
+                  }}
+                >
+                  <Icon name="image" size={32} color="#6A7282" />
+                  <span className="text-base text-gray-400">
+                    이미지를 추가하세요 (최대 5MB)
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    JPG, PNG, WebP 형식 지원
+                  </span>
+                </label>
+              )}
+            </div>
+
             {/* 곡 추가 카드 */}
             <div
               className="rounded-2xl p-6 flex flex-col gap-4"
