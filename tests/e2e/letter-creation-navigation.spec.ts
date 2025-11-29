@@ -7,8 +7,7 @@
  * - 보관함 URL에 tab=sent 쿼리 파라미터가 포함되어야 함
  */
 
-import { test, expect } from "@playwright/test";
-import { test as base, expect as baseExpect } from "./helpers/msw";
+import { test as base, expect } from "./helpers/msw";
 
 const test = base;
 
