@@ -1,11 +1,45 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/shared/components/layout/Header";
 import { useAuth } from "@/domains/auth/hooks/useAuth";
+import { LetterCard } from "@/domains/letter/components/LetterCard";
+import { getDefaultLetterImage } from "@/shared/utils/imageUpload";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [recommendedLetters, setRecommendedLetters] = useState<any[]>([]);
+  const [isLoadingLetters, setIsLoadingLetters] = useState(false);
+
+  // 추천 편지 로드
+  useEffect(() => {
+    const loadRecommendedLetters = async () => {
+      setIsLoadingLetters(true);
+      try {
+        // 둘러보기 API에서 공개 편지 가져오기 (최대 3개)
+        const response = await fetch("/api/letters?type=discover");
+        if (response.ok) {
+          const data = await response.json();
+          const letters = data.letters || [];
+          // 최대 3개만 표시
+          setRecommendedLetters(letters.slice(0, 3));
+        } else {
+          // API 실패 시 빈 배열
+          setRecommendedLetters([]);
+        }
+      } catch (error) {
+        console.error("추천 편지 로드 실패:", error);
+        setRecommendedLetters([]);
+      } finally {
+        setIsLoadingLetters(false);
+      }
+    };
+
+    loadRecommendedLetters();
+  }, []);
   
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
