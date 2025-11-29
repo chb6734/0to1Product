@@ -18,6 +18,23 @@ export function useDefaultPlatform() {
   const [defaultPlatform, setDefaultPlatformState] = useState<Platform>(null)
 
   useEffect(() => {
+    // localStorage에서 직접 확인 (useAuth가 업데이트되지 않을 수 있음)
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('fanstage_auth_user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed.defaultPlatform !== undefined) {
+            setDefaultPlatformState(parsed.defaultPlatform as Platform)
+            return
+          }
+        }
+      } catch (error) {
+        console.error('[useDefaultPlatform] localStorage 읽기 실패:', error)
+      }
+    }
+    
+    // useAuth의 user에서 확인
     if (user?.defaultPlatform !== undefined) {
       setDefaultPlatformState(user.defaultPlatform as Platform)
     } else {
@@ -39,7 +56,24 @@ export function useDefaultPlatform() {
     }
 
     const { user: updatedUser } = await response.json()
-    setDefaultPlatformState(updatedUser.defaultPlatform as Platform)
+    const platformValue = updatedUser.defaultPlatform as Platform
+    setDefaultPlatformState(platformValue)
+    
+    // useAuth의 user 상태도 업데이트 (localStorage 동기화)
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('fanstage_auth_user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          const updated = { ...parsed, defaultPlatform: platformValue }
+          localStorage.setItem('fanstage_auth_user', JSON.stringify(updated))
+          // useAuth가 localStorage를 감시하도록 커스텀 이벤트 발생
+          window.dispatchEvent(new Event('localStorageChange'))
+        }
+      } catch (error) {
+        console.error('[useDefaultPlatform] localStorage 업데이트 실패:', error)
+      }
+    }
   }
 
   return {

@@ -180,8 +180,12 @@ test.describe("Full User Journey v4", () => {
     // Then: 보관함으로 이동
     await expect(page).toHaveURL(/\/inbox/);
 
-    // 편지 클릭
-    const letterCard = page.getByText(/기존 사용자 테스트/i);
+    // 편지 클릭 (편지 카드 클릭)
+    // 편지 메시지 텍스트를 포함하는 클릭 가능한 카드 찾기
+    const letterMessage = page.getByText(/기존 사용자 테스트/i);
+    await letterMessage.waitFor({ state: 'visible' });
+    // 편지 카드 컨테이너 찾기 (rounded-2xl 클래스를 가진 부모 요소)
+    const letterCard = letterMessage.locator('xpath=ancestor::div[contains(@class, "rounded-2xl")]').first();
     await letterCard.click();
 
     // 편지 상세 페이지에서 "전체 재생" 클릭

@@ -1,7 +1,7 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
+- generic [ref=e1]:
   - alert [ref=e2]
   - generic [ref=e3]:
     - banner [ref=e4]:
@@ -22,60 +22,90 @@
             - text: 편지 만들기
           - generic [ref=e18]: ME
     - generic [ref=e19]:
-      - heading "내 보관함" [level=1] [ref=e21]
-      - generic [ref=e22]:
-        - button "받은 편지" [ref=e23] [cursor=pointer]
-        - button "보낸 편지" [ref=e24] [cursor=pointer]
-      - generic [ref=e25]:
-        - generic [ref=e27]:
-          - generic [ref=e28]: 음
-          - generic [ref=e29]:
-            - generic [ref=e30]:
-              - heading "음악러버" [level=3] [ref=e31]
-              - generic [ref=e32]: 2024-01-10T10:00:00Z
-            - paragraph [ref=e33]: 생일 축하해! 이 곡들을 들으면서 행복한 하루 보내길 바라!
-            - generic [ref=e34]:
-              - generic [ref=e35]:
-                - img [ref=e36]
-                - generic [ref=e38]: 2곡
-              - generic [ref=e39]:
-                - img [ref=e40]
-                - generic [ref=e42]: 0회 재생
-              - generic [ref=e43]:
-                - img [ref=e44]
-                - generic [ref=e46]: 0개
+      - button "뒤로 가기" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]
+        - generic [ref=e23]: 뒤로 가기
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: KS
+          - generic [ref=e27]:
+            - heading "김서연" [level=2] [ref=e28]
+            - paragraph [ref=e29]: 2일 전
+          - img [ref=e30]
+        - paragraph [ref=e33]: 요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요. 추운 겨울밤, 창밖을 보며 들으면 정말 좋아요. 함께 들으면 좋겠어서 공유해요!
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - img [ref=e36]
+            - generic [ref=e38]: 15곡
+          - generic [ref=e39]:
+            - img [ref=e40]
+            - generic [ref=e42]: 1245회 재생
+          - generic [ref=e43]:
+            - img [ref=e44]
+            - generic [ref=e46]: 89개
+      - generic [ref=e47]:
         - generic [ref=e48]:
-          - generic [ref=e49]: 플
-          - generic [ref=e50]:
-            - generic [ref=e51]:
-              - heading "플레이리스트마스터" [level=3] [ref=e52]
-              - generic [ref=e53]: 2024-01-11T15:30:00Z
-            - paragraph [ref=e54]: 오늘 하루 힘들었을 것 같아서 위로의 플레이리스트를 만들어봤어.
-            - generic [ref=e55]:
-              - generic [ref=e56]:
-                - img [ref=e57]
-                - generic [ref=e59]: 1곡
-              - generic [ref=e60]:
-                - img [ref=e61]
-                - generic [ref=e63]: 0회 재생
-              - generic [ref=e64]:
-                - img [ref=e65]
-                - generic [ref=e67]: 0개
-        - generic [ref=e69]:
-          - generic [ref=e70]: 음
-          - generic [ref=e71]:
-            - generic [ref=e72]:
-              - heading "음악러버" [level=3] [ref=e73]
-              - generic [ref=e74]: 2025-11-29T08:20:30.541Z
-            - paragraph [ref=e75]: 기존 사용자 테스트
-            - generic [ref=e76]:
-              - generic [ref=e77]:
-                - img [ref=e78]
-                - generic [ref=e80]: 1곡
-              - generic [ref=e81]:
-                - img [ref=e82]
-                - generic [ref=e84]: 0회 재생
-              - generic [ref=e85]:
-                - img [ref=e86]
-                - generic [ref=e88]: 0개
+          - heading "플레이리스트" [level=3] [ref=e49]
+          - button "전체 재생" [active] [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+            - text: 전체 재생
+        - generic [ref=e53]:
+          - generic [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: "1"
+            - img [ref=e57]
+            - generic [ref=e59]:
+              - heading "Winter Song" [level=4] [ref=e60]
+              - paragraph [ref=e61]: The Dreamers
+            - button [ref=e62]:
+              - img [ref=e63]
+          - generic [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]: "2"
+            - img [ref=e68]
+            - generic [ref=e70]:
+              - heading "Snowflake" [level=4] [ref=e71]
+              - paragraph [ref=e72]: Coldplay
+            - button [ref=e73]:
+              - img [ref=e74]
+          - generic [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: "3"
+            - img [ref=e79]
+            - generic [ref=e81]:
+              - heading "December" [level=4] [ref=e82]
+              - paragraph [ref=e83]: Taylor Swift
+            - button [ref=e84]:
+              - img [ref=e85]
+          - generic [ref=e87] [cursor=pointer]:
+            - generic [ref=e88]: "4"
+            - img [ref=e90]
+            - generic [ref=e92]:
+              - heading "Frozen" [level=4] [ref=e93]
+              - paragraph [ref=e94]: Madonna
+            - button [ref=e95]:
+              - img [ref=e96]
+          - generic [ref=e98] [cursor=pointer]:
+            - generic [ref=e99]: "5"
+            - img [ref=e101]
+            - generic [ref=e103]:
+              - heading "Ice" [level=4] [ref=e104]
+              - paragraph [ref=e105]: Sarah McLachlan
+            - button [ref=e106]:
+              - img [ref=e107]
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - heading "플랫폼 선택" [level=2] [ref=e112]
+        - paragraph [ref=e113]: 재생할 음악 플랫폼을 선택해주세요
+      - generic [ref=e114]:
+        - button "Spotify" [ref=e115] [cursor=pointer]:
+          - img [ref=e117]
+          - generic [ref=e119]: Spotify
+        - button "Apple Music" [ref=e120] [cursor=pointer]:
+          - img [ref=e122]
+          - generic [ref=e124]: Apple Music
+        - button "YouTube Music" [ref=e125] [cursor=pointer]:
+          - img [ref=e127]
+          - generic [ref=e129]: YouTube Music
+        - button "멜론" [ref=e130] [cursor=pointer]:
+          - img [ref=e132]
+          - generic [ref=e134]: 멜론
+      - button "취소" [ref=e135] [cursor=pointer]
 ```

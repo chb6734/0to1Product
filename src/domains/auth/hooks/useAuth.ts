@@ -46,6 +46,32 @@ export function useAuth() {
     return null;
   });
 
+  // localStorage 변경 감지
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setUser(parsed);
+        }
+      } catch (error) {
+        console.error("[useAuth] storage 이벤트 처리 실패:", error);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // 커스텀 이벤트도 감지 (같은 탭에서 발생하는 localStorage 변경)
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
+  }, []);
+
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window === "undefined") return false;
     try {

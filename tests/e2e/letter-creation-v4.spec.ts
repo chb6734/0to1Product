@@ -66,9 +66,11 @@ test.describe('Letter Creation Flow v4', () => {
     await expect(page.getByText(/링크.*복사/i)).toBeVisible()
     await expect(page.getByText(/QR 코드/i)).toBeVisible()
 
-    // 완료 버튼 클릭
-    const finishButton = page.getByRole('button', { name: /완료/i })
-    await finishButton.click()
+    // 완료 버튼 클릭 (완성 모달의 완료 버튼)
+    await expect(page.getByText(/편지가 완성되었습니다/i)).toBeVisible();
+    const modalContainer = page.locator('.fixed.inset-0').filter({ hasText: /편지가 완성되었습니다/i });
+    const finishButton = modalContainer.getByRole('button', { name: /^완료$/i });
+    await finishButton.click();
 
     // 보관함으로 이동 확인
     await expect(page).toHaveURL(/\/inbox/)

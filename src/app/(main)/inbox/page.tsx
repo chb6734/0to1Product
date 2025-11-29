@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "@/shared/components/layout/Header";
 import { LetterCard } from "@/domains/letter/components/LetterCard";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
@@ -12,6 +13,7 @@ import {
 import { useLetter } from "@/domains/letter/hooks/useLetter";
 
 export default function InboxPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
   const { user, isAuthenticated } = useAuth();
   const { createLetter } = useLetter();
