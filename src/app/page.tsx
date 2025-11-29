@@ -124,94 +124,130 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl overflow-hidden"
-              style={{
-                backgroundColor: "#121212",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
-              }}
-            >
-              {/* 그라데이션 이미지 영역 */}
+          {isLoadingLetters ? (
+            <div className="col-span-3 text-center text-gray-400 py-12">
+              로딩 중...
+            </div>
+          ) : recommendedLetters.length > 0 ? (
+            recommendedLetters.map((letter) => {
+              // sender가 객체인 경우 nickname 또는 email 추출
+              const senderName =
+                typeof letter.sender === "object" && letter.sender !== null
+                  ? letter.sender.nickname || letter.sender.email || ""
+                  : letter.sender || "";
+
+              // senderInitials 추출
+              const senderInitials =
+                typeof letter.sender === "object" && letter.sender !== null
+                  ? letter.sender.nickname?.[0]?.toUpperCase() ||
+                    letter.sender.email?.[0]?.toUpperCase() ||
+                    ""
+                  : letter.senderInitials || "";
+
+              // 날짜 포맷팅
+              const formattedDate = letter.createdAt
+                ? (() => {
+                    const date = new Date(letter.createdAt);
+                    const now = new Date();
+                    const diffMs = now.getTime() - date.getTime();
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays === 0) return "오늘";
+                    if (diffDays === 1) return "어제";
+                    if (diffDays < 7) return `${diffDays}일 전`;
+                    if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
+                    if (diffDays < 365) return `${Math.floor(diffDays / 30)}개월 전`;
+                    return `${Math.floor(diffDays / 365)}년 전`;
+                  })()
+                : letter.date || "";
+
+              return (
+                <LetterCard
+                  key={letter.id}
+                  sender={senderName}
+                  senderInitials={senderInitials}
+                  message={letter.message}
+                  imageUrl={letter.imageUrl}
+                  trackCount={letter.tracks?.length || 0}
+                  playCount={letter.playCount || 0}
+                  likeCount={letter.likeCount || 0}
+                  date={formattedDate}
+                  onClick={() => router.push(`/letters/${letter.id}`)}
+                />
+              );
+            })
+          ) : (
+            // 편지가 없을 때 기본 카드 표시
+            [1, 2, 3].map((item) => (
               <div
-                className="w-full h-48"
+                key={item}
+                className="rounded-2xl overflow-hidden"
                 style={{
-                  background:
-                    "linear-gradient(180deg, #FFE11D 0%, #2ADFFF 100%)",
+                  backgroundColor: "#121212",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
                 }}
               >
-                {/* 음악 아이콘 */}
-                <div className="flex items-center justify-center h-full">
-                  <svg
-                    width="64"
-                    height="64"
-                    viewBox="0 0 64 64"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M21.33 37.33L21.33 42.67M32 5.33L32 48M42.67 37.33L42.67 42.67"
-                      stroke="#000000"
-                      strokeWidth="5.33"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                {/* 기본 이미지 */}
+                <div className="w-full h-48 overflow-hidden">
+                  <img
+                    src={getDefaultLetterImage()}
+                    alt="기본 편지 이미지"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              </div>
 
-              {/* 카드 내용 */}
-              <div className="p-4 space-y-1">
-                <h4 className="text-lg font-semibold text-white">
-                  여름 감성 플리
-                </h4>
-                <p className="text-sm text-gray-400">김서연</p>
-                <div className="flex items-center justify-between pt-2">
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M2.67 9.33L2.67 12M8 1.33L8 14.67M13.33 9.33L13.33 12"
-                        stroke="#6A7282"
-                        strokeWidth="1.33"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span className="text-sm" style={{ color: "#6A7282" }}>
-                      12곡
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1.33 2L1.33 14M8 1.33L8 14.67M14.67 2L14.67 14"
-                        stroke="#6A7282"
-                        strokeWidth="1.33"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span className="text-sm" style={{ color: "#6A7282" }}>
-                      234
-                    </span>
+                {/* 카드 내용 */}
+                <div className="p-4 space-y-1">
+                  <h4 className="text-lg font-semibold text-white">
+                    여름 감성 플리
+                  </h4>
+                  <p className="text-sm text-gray-400">김서연</p>
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-1.5">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M2.67 9.33L2.67 12M8 1.33L8 14.67M13.33 9.33L13.33 12"
+                          stroke="#6A7282"
+                          strokeWidth="1.33"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm" style={{ color: "#6A7282" }}>
+                        12곡
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1.33 2L1.33 14M8 1.33L8 14.67M14.67 2L14.67 14"
+                          stroke="#6A7282"
+                          strokeWidth="1.33"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm" style={{ color: "#6A7282" }}>
+                        234
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
 
