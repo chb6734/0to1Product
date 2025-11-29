@@ -77,6 +77,7 @@ export default function LetterDetailPage({
             })()
           : letter.date || "",
         message: letter.message || "",
+        imageUrl: letter.imageUrl,
         trackCount: letter.tracks?.length || 0,
         playCount: letter.playCount || 0,
         likeCount: letter.likeCount || 0,
