@@ -56,7 +56,7 @@ test.describe("Demo Mode Flow", () => {
     await expect(page.getByText(/데모 모드/i)).toBeVisible();
 
     // When: 곡 검색 및 추가
-    const searchInput = page.getByPlaceholderText(/곡.*검색/i);
+    const searchInput = page.getByPlaceholder(/곡.*검색/i);
     await searchInput.fill("겨울 노래");
 
     // 검색 결과 대기 및 곡 추가
@@ -65,7 +65,7 @@ test.describe("Demo Mode Flow", () => {
     await addButton.click();
 
     // And: 메시지 작성
-    const messageInput = page.getByPlaceholderText(/메시지/i);
+    const messageInput = page.getByPlaceholder(/메시지/i);
     await messageInput.fill(
       "요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요."
     );
@@ -92,14 +92,14 @@ test.describe("Demo Mode Flow", () => {
     // Given: 데모 모드로 편지 생성 완료
     await page.goto("/create?demo=true");
 
-    const searchInput = page.getByPlaceholderText(/곡.*검색/i);
+    const searchInput = page.getByPlaceholder(/곡.*검색/i);
     await searchInput.fill("Song");
     await page.waitForTimeout(500);
 
     const addButton = page.getByRole("button", { name: /추가/i }).first();
     await addButton.click();
 
-    const messageInput = page.getByPlaceholderText(/메시지/i);
+    const messageInput = page.getByPlaceholder(/메시지/i);
     await messageInput.fill("마이그레이션 테스트");
 
     const completeButton = page.getByRole("button", { name: /완료.*공유/i });
@@ -125,7 +125,7 @@ test.describe("Demo Mode Flow", () => {
 
     // 온보딩이 필요한 경우 온보딩 페이지로 이동
     if (page.url().includes("/onboarding")) {
-      const nicknameInput = page.getByPlaceholderText(/닉네임/i);
+      const nicknameInput = page.getByPlaceholder(/닉네임/i);
       await nicknameInput.fill("테스트 사용자");
 
       const startButton = page.getByRole("button", { name: /시작하기/i });
