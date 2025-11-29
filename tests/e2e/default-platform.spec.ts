@@ -22,20 +22,30 @@ test.describe('Default Platform Setting', () => {
    */
   test('should set default platform during onboarding', async ({ page }) => {
     // Given: 온보딩 페이지 진입 (로그인 후)
-    await page.goto('/login')
-    const googleLoginButton = page.getByRole('button', { name: /Google 계정으로 계속하기/i })
-    await googleLoginButton.click()
+    // Mock 인증 상태 설정 (온보딩 필요 상태)
+    await page.addInitScript(() => {
+      localStorage.setItem('fanstage_auth_user', JSON.stringify({
+        id: 'test-user-id',
+        email: 'test@example.com',
+        nickname: undefined, // 온보딩 필요
+      }));
+    });
+
+    await page.goto('/onboarding')
     
-    // 로그인 완료 후 온보딩 페이지로 이동
-    await page.waitForURL(/\/onboarding/, { timeout: 5000 })
-    await expect(page.getByText(/프로필 설정/i)).toBeVisible()
+    // 초기화 완료 대기
+    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible()
 
     // When: 닉네임 입력
-    const nicknameInput = page.getByPlaceholderText(/닉네임/i)
+    const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i)
     await nicknameInput.fill('테스트 사용자')
 
     // And: 기본 플랫폼 선택
-    const platformSelect = page.getByLabel(/주로 사용하는 음악 플랫폼/i)
+    // label 텍스트로 찾고, 그 다음에 있는 select 요소 사용
+    const platformLabel = page.getByText(/주로 사용하는 음악 플랫폼/i)
+    await expect(platformLabel).toBeVisible()
+    
+    const platformSelect = page.locator('select').filter({ hasText: /없음.*나중에 설정/i })
     await platformSelect.selectOption('spotify')
 
     // And: "시작하기" 버튼 클릭
@@ -43,7 +53,7 @@ test.describe('Default Platform Setting', () => {
     await startButton.click()
 
     // Then: 보관함으로 이동
-    await expect(page).toHaveURL(/\/inbox/)
+    await expect(page).toHaveURL(/\/inbox/, { timeout: 10000 })
   })
 
   /**
@@ -56,7 +66,14 @@ test.describe('Default Platform Setting', () => {
    */
   test('should use default platform automatically when playing letter', async ({ page }) => {
     // Given: 기본 플랫폼이 설정된 사용자로 로그인
-    // (MSW로 모킹된 사용자 프로필에 defaultPlatform: 'spotify' 설정)
+    await page.addInitScript(() => {
+      localStorage.setItem('fanstage_auth_user', JSON.stringify({
+        id: 'test-user-id',
+        email: 'test@example.com',
+        nickname: '테스트 사용자',
+        defaultPlatform: 'spotify', // 기본 플랫폼 설정
+      }));
+    });
 
     // 편지 상세 페이지 진입
     await page.goto('/letters/letter-1')
@@ -85,6 +102,15 @@ test.describe('Default Platform Setting', () => {
    */
   test('should show platform selection modal when default platform is not set', async ({ page }) => {
     // Given: 기본 플랫폼이 설정되지 않은 사용자
+    await page.addInitScript(() => {
+      localStorage.setItem('fanstage_auth_user', JSON.stringify({
+        id: 'test-user-id',
+        email: 'test@example.com',
+        nickname: '테스트 사용자',
+        defaultPlatform: null, // 기본 플랫폼 미설정
+      }));
+    });
+
     await page.goto('/letters/letter-1')
     await expect(page.getByText(/플레이리스트/i)).toBeVisible()
 
@@ -93,14 +119,15 @@ test.describe('Default Platform Setting', () => {
     await playButton.click()
 
     // Then: 플랫폼 선택 모달 표시
-    await expect(page.getByText(/플랫폼 선택/i)).toBeVisible()
+    await expect(page.getByText(/플랫폼 선택/i)).toBeVisible({ timeout: 5000 })
     
     // 플랫폼 선택
     const spotifyOption = page.getByRole('button', { name: /Spotify/i })
+    await expect(spotifyOption).toBeVisible()
     await spotifyOption.click()
 
-    // 재생 확인
-    await page.waitForTimeout(1000)
+    // 모달이 닫혔는지 확인
+    await expect(page.getByText(/플랫폼 선택/i)).not.toBeVisible({ timeout: 2000 })
   })
 })
 

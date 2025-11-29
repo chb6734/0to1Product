@@ -230,9 +230,11 @@ test.describe("사용자 인증 및 프로필 (feature_auth.md)", () => {
     // label과 select가 연결되어 있으므로 label 텍스트로 찾기
     const platformLabel = page.getByText(/주로 사용하는 음악 플랫폼/i);
     await expect(platformLabel).toBeVisible();
-    
+
     // select 요소 확인 (label 다음에 있는 select)
-    const platformSelect = page.locator('select').filter({ hasText: /없음.*나중에 설정/i });
+    const platformSelect = page
+      .locator("select")
+      .filter({ hasText: /없음.*나중에 설정/i });
     await expect(platformSelect).toBeVisible();
 
     // 시작하기 버튼 확인

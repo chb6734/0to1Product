@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/shared/components/layout/Header";
 import { ProfileAvatarGradient } from "@/shared/components/ui/ProfileAvatarGradient";
 import { Icon } from "@/shared/components/ui/Icon";
+import { PlatformSelectModal } from "@/shared/components/ui/PlatformSelectModal";
+import { useDefaultPlatform } from "@/domains/auth/hooks/useDefaultPlatform";
 
 export default function LetterDetailPage({
   params,
@@ -11,6 +14,8 @@ export default function LetterDetailPage({
   params: { id: string };
 }) {
   const router = useRouter();
+  const { defaultPlatform } = useDefaultPlatform();
+  const [isPlatformModalOpen, setIsPlatformModalOpen] = useState(false);
 
   // 예시 데이터
   const letter = {
@@ -30,6 +35,22 @@ export default function LetterDetailPage({
       { id: 4, title: "Frozen", artist: "Madonna" },
       { id: 5, title: "Ice", artist: "Sarah McLachlan" },
     ],
+  };
+
+  const handlePlayAll = () => {
+    if (defaultPlatform) {
+      // 기본 플랫폼이 설정되어 있으면 바로 재생
+      playOnPlatform(defaultPlatform);
+    } else {
+      // 기본 플랫폼이 없으면 모달 표시
+      setIsPlatformModalOpen(true);
+    }
+  };
+
+  const playOnPlatform = (platform: "spotify" | "apple" | "youtube" | "melon") => {
+    // 실제 구현에서는 플랫폼별 재생 로직 호출
+    console.log(`재생: ${platform}`, letter.tracks);
+    // 예: window.open(`spotify:playlist:...`) 또는 API 호출
   };
 
   return (
@@ -118,6 +139,7 @@ export default function LetterDetailPage({
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-semibold text-white">플레이리스트</h3>
               <button
+                onClick={handlePlayAll}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#FFE11D", color: "#000000" }}
               >
@@ -192,6 +214,13 @@ export default function LetterDetailPage({
           </div>
         </div>
       </div>
+
+      {/* 플랫폼 선택 모달 */}
+      <PlatformSelectModal
+        isOpen={isPlatformModalOpen}
+        onClose={() => setIsPlatformModalOpen(false)}
+        onSelect={playOnPlatform}
+      />
     </div>
   );
 }
