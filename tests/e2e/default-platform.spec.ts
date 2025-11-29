@@ -140,9 +140,7 @@ test.describe("기본 플랫폼 설정", () => {
    * When: "전체 재생" 버튼을 클릭함
    * Then: Spotify로 바로 재생됨 (플랫폼 선택 모달 없이)
    */
-  test("편지 재생 시 기본 플랫폼 자동 사용", async ({
-    page,
-  }) => {
+  test("편지 재생 시 기본 플랫폼 자동 사용", async ({ page }) => {
     // Given: 기본 플랫폼이 설정된 사용자로 로그인
     await page.addInitScript(() => {
       localStorage.setItem(
@@ -181,9 +179,7 @@ test.describe("기본 플랫폼 설정", () => {
    * Then: 플랫폼 선택 모달이 표시됨
    * And: 플랫폼을 선택하면 재생됨
    */
-  test("기본 플랫폼 미설정 시 플랫폼 선택 모달 표시", async ({
-    page,
-  }) => {
+  test("기본 플랫폼 미설정 시 플랫폼 선택 모달 표시", async ({ page }) => {
     // Given: 기본 플랫폼이 설정되지 않은 사용자
     await page.addInitScript(() => {
       localStorage.setItem(
