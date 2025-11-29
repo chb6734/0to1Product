@@ -138,20 +138,25 @@ const letterHandlers = [
     const url = new URL(request.url)
     const type = url.searchParams.get('type') // 'received' 또는 'sent'
     
-    // 현재 사용자 정보 가져오기 (localStorage에서 가져온다고 가정)
-    // 실제로는 요청 헤더나 쿠키에서 사용자 정보를 가져와야 함
-    // 여기서는 mockUsers[0]을 현재 사용자로 가정
+    // 현재 사용자 정보 가져오기
+    // 실제 환경에서는 요청 헤더나 쿠키에서 사용자 정보를 가져와야 함
+    // MSW에서는 브라우저의 localStorage를 직접 접근할 수 없으므로
+    // mockUsers[0]을 현재 사용자로 가정하거나, 요청 헤더에서 사용자 정보를 가져옴
+    // 여기서는 편지 생성 시 senderId가 설정되므로, senderId로 필터링
     const currentUserId = mockUsers[0]?.id
     const currentUserEmail = mockUsers[0]?.email
     
     let filteredLetters = mockLetters
     
     if (type === 'sent') {
-      // 보낸 편지: senderId가 현재 사용자 ID와 일치하는 편지
+      // 보낸 편지: senderId가 현재 사용자 ID와 일치하는 편지만 표시
       filteredLetters = mockLetters.filter(letter => letter.senderId === currentUserId)
     } else if (type === 'received') {
-      // 받은 편지: recipientEmail이 현재 사용자 이메일과 일치하는 편지
-      filteredLetters = mockLetters.filter(letter => letter.recipientEmail === currentUserEmail)
+      // 받은 편지: recipientEmail이 현재 사용자 이메일과 일치하는 편지만 표시
+      // 받은 편지는 다른 사용자가 보낸 편지이므로, senderId가 현재 사용자와 다른 편지
+      filteredLetters = mockLetters.filter(letter => 
+        letter.recipientEmail === currentUserEmail && letter.senderId !== currentUserId
+      )
     }
     
     return HttpResponse.json({ letters: filteredLetters })
