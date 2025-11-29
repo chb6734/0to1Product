@@ -20,20 +20,23 @@ const server = setupServer(
       profileImage?: string;
       defaultPlatform?: string | null;
     };
-    
+
     // 요청 본문에 따라 사용자 데이터 생성
     const user = {
       id: "test-user-id",
       email: "test@example.com",
       nickname: body.nickname,
       profileImage: body.profileImage,
-      defaultPlatform: body.defaultPlatform !== undefined ? body.defaultPlatform : undefined,
+      defaultPlatform:
+        body.defaultPlatform !== undefined ? body.defaultPlatform : undefined,
       createdAt: new Date().toISOString(),
     };
-    
+
     return HttpResponse.json({ user });
   })
 );
+
+const test = base;
 
 // MSW 서버 시작/종료
 test.beforeAll(() => {
@@ -47,8 +50,6 @@ test.afterEach(() => {
 test.afterAll(() => {
   server.close();
 });
-
-const test = base;
 
 test.describe("Default Platform Setting", () => {
   /**
