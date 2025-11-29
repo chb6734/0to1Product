@@ -11,7 +11,12 @@ import {
   migrateDemoLetterToServer,
 } from "@/shared/utils/demoMode";
 import { useLetter } from "@/domains/letter/hooks/useLetter";
-import { sortLetters, filterLetters, type SortOption, type FilterOptions } from "@/shared/utils/sortFilter";
+import {
+  sortLetters,
+  filterLetters,
+  type SortOption,
+  type FilterOptions,
+} from "@/shared/utils/sortFilter";
 import { Icon } from "@/shared/components/ui/Icon";
 
 export default function InboxPage() {
@@ -21,7 +26,7 @@ export default function InboxPage() {
   const { createLetter } = useLetter();
   const [letters, setLetters] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // 정렬/필터 상태 (P1)
   const [sortOption, setSortOption] = useState<SortOption>("date-desc");
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({});
@@ -36,18 +41,18 @@ export default function InboxPage() {
       if (response.ok) {
         const data = await response.json();
         let loadedLetters = data.letters || [];
-        
+
         // 중복 제거 (같은 메시지를 가진 편지 제거)
         const seenMessages = new Set<string>();
         loadedLetters = loadedLetters.filter((letter: any) => {
-          const message = letter.message || '';
+          const message = letter.message || "";
           if (seenMessages.has(message)) {
             return false;
           }
           seenMessages.add(message);
           return true;
         });
-        
+
         // 보낸 편지 탭에서 데모 모드 편지도 함께 표시 (마이그레이션 전, 로그인하지 않은 경우만)
         if (activeTab === "sent" && !isAuthenticated) {
           const demoData = loadDemoLetter();
@@ -73,7 +78,7 @@ export default function InboxPage() {
             }
           }
         }
-        
+
         setLetters(loadedLetters);
       } else {
         // API 실패 시 데모 모드 편지 표시 (보낸 편지 탭에서만, 로그인하지 않은 경우만)
@@ -130,7 +135,7 @@ export default function InboxPage() {
 
   // 데모 모드 편지 마이그레이션 (한 번만 실행)
   const [hasMigrated, setHasMigrated] = useState(false);
-  
+
   useEffect(() => {
     const migrateDemoLetter = async () => {
       // 이미 마이그레이션했거나 로그인하지 않은 경우 스킵
@@ -168,7 +173,7 @@ export default function InboxPage() {
           const result = await response.json();
           return { id: result.id || result.letter?.id };
         });
-        
+
         setHasMigrated(true);
         // 마이그레이션 성공 후 편지 목록 다시 로드
         await loadLetters();
@@ -259,28 +264,32 @@ export default function InboxPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {letters.map((letter) => {
             // sender가 객체인 경우 nickname 또는 email 추출
-            const senderName = 
-              typeof letter.sender === 'object' && letter.sender !== null
-                ? letter.sender.nickname || letter.sender.email || ''
-                : letter.sender || '';
-            
+            const senderName =
+              typeof letter.sender === "object" && letter.sender !== null
+                ? letter.sender.nickname || letter.sender.email || ""
+                : letter.sender || "";
+
             // recipient가 객체인 경우 nickname 또는 email 추출
-            const recipientName = 
-              typeof letter.recipient === 'object' && letter.recipient !== null
-                ? letter.recipient.nickname || letter.recipient.email || ''
-                : letter.recipient || '';
-            
+            const recipientName =
+              typeof letter.recipient === "object" && letter.recipient !== null
+                ? letter.recipient.nickname || letter.recipient.email || ""
+                : letter.recipient || "";
+
             // senderInitials 추출 (객체인 경우 nickname의 첫 글자)
-            const senderInitials = 
-              typeof letter.sender === 'object' && letter.sender !== null
-                ? letter.sender.nickname?.[0]?.toUpperCase() || letter.sender.email?.[0]?.toUpperCase() || ''
-                : letter.senderInitials || '';
-            
+            const senderInitials =
+              typeof letter.sender === "object" && letter.sender !== null
+                ? letter.sender.nickname?.[0]?.toUpperCase() ||
+                  letter.sender.email?.[0]?.toUpperCase() ||
+                  ""
+                : letter.senderInitials || "";
+
             // recipientInitials 추출 (객체인 경우 nickname의 첫 글자)
-            const recipientInitials = 
-              typeof letter.recipient === 'object' && letter.recipient !== null
-                ? letter.recipient.nickname?.[0]?.toUpperCase() || letter.recipient.email?.[0]?.toUpperCase() || ''
-                : letter.recipientInitials || '';
+            const recipientInitials =
+              typeof letter.recipient === "object" && letter.recipient !== null
+                ? letter.recipient.nickname?.[0]?.toUpperCase() ||
+                  letter.recipient.email?.[0]?.toUpperCase() ||
+                  ""
+                : letter.recipientInitials || "";
 
             return (
               <LetterCard
@@ -293,7 +302,7 @@ export default function InboxPage() {
                 trackCount={letter.trackCount || letter.tracks?.length || 0}
                 playCount={letter.playCount || 0}
                 likeCount={letter.likeCount || 0}
-                date={letter.date || letter.createdAt || ''}
+                date={letter.date || letter.createdAt || ""}
                 onClick={() => {
                   if (letter.id && letter.id !== "demo-letter") {
                     router.push(`/letters/${letter.id}`);
@@ -319,4 +328,3 @@ export default function InboxPage() {
     </div>
   );
 }
-

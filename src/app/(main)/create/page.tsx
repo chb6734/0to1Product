@@ -44,9 +44,7 @@ function RestoreDraftModal({
         <h2 className="text-2xl font-bold text-white mb-2">
           이전에 작성하던 편지가 있습니다
         </h2>
-        <p className="text-base text-gray-400 mb-4">
-          복구하시겠습니까?
-        </p>
+        <p className="text-base text-gray-400 mb-4">복구하시겠습니까?</p>
         <div className="flex gap-3">
           <button
             onClick={onRestore}
@@ -258,7 +256,9 @@ export default function CreateLetterPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
-  const [letterLink, setLetterLink] = useState("https://fanstage.com/l/abc123xyz");
+  const [letterLink, setLetterLink] = useState(
+    "https://fanstage.com/l/abc123xyz"
+  );
 
   const {
     letter,
@@ -269,9 +269,11 @@ export default function CreateLetterPage() {
     isCreating,
     loadDraft,
   } = useLetter();
-  
+
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
-  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<string[]>([]);
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<
+    string[]
+  >([]);
 
   // 데모 모드 확인
   const demoMode = searchParams.get("demo") === "true" || isDemoMode();
@@ -459,26 +461,27 @@ export default function CreateLetterPage() {
                   className="absolute left-4 top-1/2 -translate-y-1/2"
                 />
                 {/* 자동완성 제안 (P1) - 검색 결과가 없을 때만 표시 */}
-                {autocompleteSuggestions.length > 0 && searchResults.length === 0 && (
-                  <div
-                    className="absolute z-10 w-full mt-1 rounded-lg overflow-hidden shadow-lg"
-                    style={{
-                      backgroundColor: "#1A1A1A",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                    }}
-                    data-testid="autocomplete-suggestions"
-                  >
-                    {autocompleteSuggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleAutocompleteClick(suggestion)}
-                        className="w-full px-4 py-2 text-left text-base text-white hover:bg-gray-800 transition-colors"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {autocompleteSuggestions.length > 0 &&
+                  searchResults.length === 0 && (
+                    <div
+                      className="absolute z-10 w-full mt-1 rounded-lg overflow-hidden shadow-lg"
+                      style={{
+                        backgroundColor: "#1A1A1A",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                      }}
+                      data-testid="autocomplete-suggestions"
+                    >
+                      {autocompleteSuggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleAutocompleteClick(suggestion)}
+                          className="w-full px-4 py-2 text-left text-base text-white hover:bg-gray-800 transition-colors"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
               </div>
 
               {/* 검색 결과 */}
@@ -523,7 +526,9 @@ export default function CreateLetterPage() {
               {/* 추가된 곡 목록 */}
               {letter.tracks.length > 0 && (
                 <div className="flex flex-col gap-2 mt-4">
-                  <h4 className="text-lg font-semibold text-white">추가된 곡</h4>
+                  <h4 className="text-lg font-semibold text-white">
+                    추가된 곡
+                  </h4>
                   {letter.tracks.map((track, index) => (
                     <div
                       key={track.id}
@@ -538,7 +543,9 @@ export default function CreateLetterPage() {
                           <p className="text-base text-white font-medium">
                             {track.title}
                           </p>
-                          <p className="text-sm text-gray-400">{track.artist}</p>
+                          <p className="text-sm text-gray-400">
+                            {track.artist}
+                          </p>
                         </div>
                       </div>
                       <button
@@ -685,7 +692,10 @@ export default function CreateLetterPage() {
               ) : (
                 <div className="flex flex-col gap-4">
                   {letter.message && (
-                    <div className="p-4 rounded-lg" style={{ backgroundColor: "#1A1A1A" }}>
+                    <div
+                      className="p-4 rounded-lg"
+                      style={{ backgroundColor: "#1A1A1A" }}
+                    >
                       <p className="text-base text-white whitespace-pre-wrap">
                         {letter.message}
                       </p>
@@ -693,7 +703,9 @@ export default function CreateLetterPage() {
                   )}
                   {letter.tracks.length > 0 && (
                     <div className="flex flex-col gap-2">
-                      <h5 className="text-lg font-semibold text-white">플레이리스트</h5>
+                      <h5 className="text-lg font-semibold text-white">
+                        플레이리스트
+                      </h5>
                       {letter.tracks.map((track, index) => (
                         <div
                           key={track.id}
@@ -707,7 +719,9 @@ export default function CreateLetterPage() {
                             <p className="text-base text-white font-medium">
                               {track.title}
                             </p>
-                            <p className="text-sm text-gray-400">{track.artist}</p>
+                            <p className="text-sm text-gray-400">
+                              {track.artist}
+                            </p>
                           </div>
                         </div>
                       ))}
