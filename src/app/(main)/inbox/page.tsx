@@ -223,9 +223,14 @@ export default function InboxPage() {
     migrateDemoLetter();
   }, [isAuthenticated, user, loadLetters, hasMigrated]);
 
+  // 로딩 중이거나 인증되지 않은 경우 아무것도 렌더링하지 않음
+  if (isInitializing || !isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
-      <Header activeNav="inbox" showCreateButton showProfile />
+      <Header activeNav="inbox" showCreateButton />
       <div className="max-w-7xl mx-auto px-8 py-12">
         {/* 헤딩 */}
         <div className="mb-8">
