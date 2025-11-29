@@ -51,7 +51,7 @@ test.afterAll(() => {
   server.close();
 });
 
-test.describe("Default Platform Setting", () => {
+test.describe("기본 플랫폼 설정", () => {
   /**
    * 테스트: 온보딩 시 기본 플랫폼 설정
    * 시나리오: 사용자가 편지를 받을 때 자동으로 내 플랫폼에서 재생되게 하고 싶다
@@ -62,7 +62,7 @@ test.describe("Default Platform Setting", () => {
    * Then: 보관함으로 이동함
    * And: 기본 플랫폼이 설정됨
    */
-  test("should set default platform during onboarding", async ({ page }) => {
+  test("온보딩 시 기본 플랫폼 설정", async ({ page }) => {
     // Given: 온보딩 페이지 진입 (로그인 후)
     // Mock 인증 상태 설정 (온보딩 필요 상태)
     await page.addInitScript(() => {
@@ -140,7 +140,7 @@ test.describe("Default Platform Setting", () => {
    * When: "전체 재생" 버튼을 클릭함
    * Then: Spotify로 바로 재생됨 (플랫폼 선택 모달 없이)
    */
-  test("should use default platform automatically when playing letter", async ({
+  test("편지 재생 시 기본 플랫폼 자동 사용", async ({
     page,
   }) => {
     // Given: 기본 플랫폼이 설정된 사용자로 로그인
@@ -181,7 +181,7 @@ test.describe("Default Platform Setting", () => {
    * Then: 플랫폼 선택 모달이 표시됨
    * And: 플랫폼을 선택하면 재생됨
    */
-  test("should show platform selection modal when default platform is not set", async ({
+  test("기본 플랫폼 미설정 시 플랫폼 선택 모달 표시", async ({
     page,
   }) => {
     // Given: 기본 플랫폼이 설정되지 않은 사용자

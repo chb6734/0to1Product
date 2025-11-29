@@ -9,7 +9,7 @@
 
 import { test, expect } from "@playwright/test";
 
-test.describe("Full User Journey v4", () => {
+test.describe("전체 사용자 여정 v4", () => {
   /**
    * 테스트: 신규 사용자 전체 플로우 (개선)
    * 시나리오: 처음 사용하는 사용자가 서비스를 체험하고 편지를 만들고 싶다
@@ -22,7 +22,7 @@ test.describe("Full User Journey v4", () => {
    * And: 온보딩에서 닉네임 입력 및 기본 플랫폼 설정
    * Then: 보관함으로 이동 (편지가 자동으로 저장됨)
    */
-  test("should complete full user journey with demo mode", async ({ page }) => {
+  test("데모 모드로 전체 사용자 여정 완료", async ({ page }) => {
     // Given: 랜딩 페이지 진입
     await page.goto("/");
     await expect(page.getByText(/어떤 플랫폼이든/i)).toBeVisible();
@@ -117,7 +117,7 @@ test.describe("Full User Journey v4", () => {
    * And: 편지를 클릭하여 상세 페이지로 이동
    * And: "전체 재생" 클릭 (기본 플랫폼으로 자동 재생)
    */
-  test("should complete existing user flow with default platform", async ({
+  test("기본 플랫폼으로 기존 사용자 플로우 완료", async ({
     page,
   }) => {
     // Given: 로그인된 상태 (MSW로 모킹)

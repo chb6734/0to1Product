@@ -12,7 +12,7 @@
 
 import { test, expect } from "@playwright/test";
 
-test.describe("Demo Mode Flow", () => {
+test.describe("데모 모드 플로우", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
@@ -25,7 +25,7 @@ test.describe("Demo Mode Flow", () => {
    * Then: 편지 생성 페이지로 이동함 (데모 모드)
    * And: 상단에 "데모 모드" 배지가 표시됨
    */
-  test("should enter demo mode from landing page", async ({ page }) => {
+  test("랜딩 페이지에서 데모 모드 진입", async ({ page }) => {
     // Given: 랜딩 페이지에 있음
     await expect(page.getByText(/어떤 플랫폼이든/i)).toBeVisible();
 
@@ -50,7 +50,7 @@ test.describe("Demo Mode Flow", () => {
    * Then: 완성 모달이 표시됨
    * And: "임시 링크 (24시간 후 만료)" 메시지가 표시됨
    */
-  test("should create letter in demo mode", async ({ page }) => {
+  test("데모 모드로 편지 생성", async ({ page }) => {
     // Given: 데모 모드로 편지 생성 페이지 진입
     await page.goto("/create?demo=true");
     await expect(page.getByText(/데모 모드/i)).toBeVisible();
@@ -88,7 +88,7 @@ test.describe("Demo Mode Flow", () => {
    * And: 로그인 완료 후 보관함으로 이동함
    * And: 편지가 보관함에 저장되어 있음
    */
-  test("should migrate demo letter to server on login", async ({ page }) => {
+  test("로그인 시 데모 모드 편지를 서버로 마이그레이션", async ({ page }) => {
     // Given: 데모 모드로 편지 생성 완료
     await page.goto("/create?demo=true");
 

@@ -9,7 +9,7 @@
 
 import { test, expect } from '@playwright/test'
 
-test.describe('Letter Creation Flow v4', () => {
+test.describe('편지 생성 플로우 v4', () => {
   test.beforeEach(async ({ page }) => {
     // 로그인 상태로 가정 (MSW로 모킹)
     await page.goto('/')
@@ -27,7 +27,7 @@ test.describe('Letter Creation Flow v4', () => {
    * And: 링크 복사 및 QR 코드가 표시됨
    * And: "완료" 버튼 클릭 시 보관함으로 이동함
    */
-  test('should create letter with simplified flow', async ({ page }) => {
+  test('간소화된 플로우로 편지 생성', async ({ page }) => {
     // Given: 편지 생성 페이지 진입
     await page.goto('/create')
     await expect(page.getByText(/음악 편지 만들기/i)).toBeVisible()
@@ -84,7 +84,7 @@ test.describe('Letter Creation Flow v4', () => {
    * Then: 링크가 클립보드에 복사됨
    * And: "링크가 복사되었습니다" 토스트 메시지가 표시됨
    */
-  test('should copy link from completion modal', async ({ page }) => {
+  test('완성 모달에서 링크 복사', async ({ page }) => {
     await page.goto('/create')
 
     // 편지 생성 완료 (간소화)
