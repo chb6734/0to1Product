@@ -115,36 +115,27 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     await page.goto('/onboarding');
 
     // 초기화 완료 대기
-    await page.waitForSelector('text=프로필 설정', { timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
 
     // 닉네임 입력 필드 확인
     const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     await expect(nicknameInput).toBeVisible();
 
-    // 폼 요소 찾기
-    const form = page.locator('form');
-    await expect(form).toBeVisible();
-
-    // "시작하기" 버튼 확인
+    // "시작하기" 버튼 확인 - 닉네임 미입력 시 비활성화되어야 함
     const submitButton = page.getByRole('button', { name: /시작하기/i });
     await expect(submitButton).toBeVisible();
     await expect(submitButton).toBeDisabled(); // 닉네임 미입력 시 비활성화
 
-    // 폼 제출 (submit 이벤트 직접 트리거)
-    await form.evaluate((form) => {
-      const event = new Event('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(event);
-    });
+    // 닉네임 입력 후 버튼이 활성화되는지 확인
+    await nicknameInput.fill('테스트 닉네임');
+    await expect(submitButton).toBeEnabled();
 
-    // 에러 메시지가 나타날 때까지 대기
-    await page.waitForSelector('text=닉네임을 입력해주세요', { timeout: 5000 });
+    // 닉네임을 다시 비우면 버튼이 비활성화되는지 확인
+    await nicknameInput.fill('');
+    await expect(submitButton).toBeDisabled();
 
-    // 에러 메시지 확인
-    const errorMessage = page.getByText(/닉네임을 입력해주세요/i);
-    await expect(errorMessage).toBeVisible();
-
-    // 닉네임 입력 필드가 여전히 보이는지 확인 (리다이렉트되지 않았는지)
-    await expect(nicknameInput).toBeVisible();
+    // 페이지가 리다이렉트되지 않았는지 확인
+    await expect(page).toHaveURL(/\/onboarding/);
   });
 
   /**
@@ -184,22 +175,26 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     await page.goto('/onboarding');
 
     // 초기화 완료 대기
-    await page.waitForSelector('text=프로필 설정', { timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
 
     // 페이지 제목 확인
     await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
+    await expect(page.getByText(/닉네임과 프로필 사진을 설정해주세요/i)).toBeVisible();
+
+    // 프로필 사진 업로드 영역 확인
+    await expect(page.getByText(/프로필 사진.*선택/i)).toBeVisible();
 
     // 닉네임 입력 필드 확인
     const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     await expect(nicknameInput).toBeVisible();
     await expect(nicknameInput).toHaveAttribute('maxLength', '20');
 
-    // 프로필 이미지 URL 입력 필드 확인
-    const profileImageInput = page.getByLabel(/프로필 이미지 URL/i);
-    await expect(profileImageInput).toBeVisible();
+    // 기본 플랫폼 설정 필드 확인 (PRD v4)
+    const platformSelect = page.getByLabel(/주로 사용하는 음악 플랫폼/i);
+    await expect(platformSelect).toBeVisible();
 
-    // 완료 버튼 확인
-    await expect(page.getByRole('button', { name: /완료/i })).toBeVisible();
+    // 시작하기 버튼 확인
+    await expect(page.getByRole('button', { name: /시작하기/i })).toBeVisible();
   });
 
   /**
@@ -218,9 +213,9 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     await page.goto('/onboarding');
 
     // 초기화 완료 대기
-    await page.waitForSelector('text=프로필 설정', { timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
 
-    const nicknameInput = page.getByLabel(/닉네임/i);
+    const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     
     // 20자 초과 입력 시도
     const longNickname = 'a'.repeat(21);
@@ -229,6 +224,9 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     // maxLength 속성으로 인해 20자까지만 입력되어야 함
     const value = await nicknameInput.inputValue();
     expect(value.length).toBeLessThanOrEqual(20);
+
+    // 문자 수 표시 확인
+    await expect(page.getByText(/20\/20/i)).toBeVisible();
   });
 });
 
