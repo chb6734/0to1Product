@@ -8,6 +8,7 @@ export interface MockUser {
   email: string
   nickname?: string  // 선택적 필드로 변경 (신규 사용자는 닉네임 없음)
   profileImage?: string
+  defaultPlatform?: 'spotify' | 'apple' | 'youtube' | 'melon' | null  // 기본 플랫폼 설정
   createdAt: string
 }
 

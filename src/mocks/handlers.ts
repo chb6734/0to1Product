@@ -112,6 +112,18 @@ const authHandlers = [
     }
     return HttpResponse.json({ user: updatedUser })
   }),
+
+  // 기본 플랫폼 설정 (프로필 수정의 일부이지만 명시적으로 추가)
+  http.put('/api/auth/profile', async ({ request }) => {
+    await delay(400)
+    const body = await request.json() as { defaultPlatform?: string }
+    const updatedUser = {
+      ...mockUsers[0],
+      defaultPlatform: body.defaultPlatform || null,
+      updatedAt: new Date().toISOString(),
+    }
+    return HttpResponse.json({ user: updatedUser })
+  }),
 ]
 
 // 편지 관련 핸들러

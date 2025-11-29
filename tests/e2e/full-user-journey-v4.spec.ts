@@ -1,0 +1,162 @@
+/**
+ * 전체 사용자 여정 E2E 테스트 (PRD v4)
+ * 
+ * 목적: 사용자 시나리오 v2 - 시나리오 6.1 검증
+ * 시나리오: 전체 플로우 (신규 사용자, 개선)
+ * 
+ * 기반: PRD v4 - 신규 사용자 플로우 개선
+ */
+
+import { test, expect } from '@playwright/test'
+
+test.describe('Full User Journey v4', () => {
+  /**
+   * 테스트: 신규 사용자 전체 플로우 (개선)
+   * 시나리오: 처음 사용하는 사용자가 서비스를 체험하고 편지를 만들고 싶다
+   * Given: 사용자가 FAN:STAGE를 처음 방문함
+   * When: 랜딩 페이지에서 "로그인 없이 체험하기" 클릭
+   * And: 데모 모드로 편지 생성 (곡 추가, 메시지 작성)
+   * And: 완성 모달에서 링크 복사
+   * And: 만족하여 "영구 저장하려면 로그인하기" 클릭
+   * And: 로그인 완료
+   * And: 온보딩에서 닉네임 입력 및 기본 플랫폼 설정
+   * Then: 보관함으로 이동 (편지가 자동으로 저장됨)
+   */
+  test('should complete full user journey with demo mode', async ({ page }) => {
+    // Given: 랜딩 페이지 진입
+    await page.goto('/')
+    await expect(page.getByText(/어떤 플랫폼이든/i)).toBeVisible()
+
+    // When: "로그인 없이 체험하기" 클릭
+    const demoButton = page.getByRole('button', { name: /로그인 없이 체험하기/i })
+    await demoButton.click()
+
+    // 데모 모드로 편지 생성 페이지 진입 확인
+    await expect(page).toHaveURL(/\/create/)
+    await expect(page.getByText(/데모 모드/i)).toBeVisible()
+
+    // And: 곡 추가 및 메시지 작성
+    const searchInput = page.getByPlaceholderText(/곡.*검색/i)
+    await searchInput.fill('겨울 노래')
+    await page.waitForTimeout(500)
+
+    const addButton = page.getByRole('button', { name: /추가/i }).first()
+    await addButton.click()
+
+    const messageInput = page.getByPlaceholderText(/메시지/i)
+    await messageInput.fill('요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요.')
+
+    // 완료 및 공유 버튼 클릭
+    const completeButton = page.getByRole('button', { name: /완료.*공유/i })
+    await completeButton.click()
+
+    // 완성 모달 확인
+    await expect(page.getByText(/편지가 완성되었습니다/i)).toBeVisible()
+
+    // And: 링크 복사
+    const copyButton = page.getByRole('button', { name: /복사/i })
+    await copyButton.click()
+    await expect(page.getByText(/링크가 복사되었습니다/i)).toBeVisible()
+
+    // And: "영구 저장하려면 로그인하기" 클릭
+    const loginButton = page.getByRole('button', { name: /영구 저장.*로그인/i })
+    await loginButton.click()
+
+    // 로그인 페이지로 이동
+    await expect(page).toHaveURL(/\/login/)
+
+    // 로그인 완료
+    const googleLoginButton = page.getByRole('button', { name: /Google/i })
+    await googleLoginButton.click()
+
+    // 온보딩 페이지로 이동
+    await page.waitForURL(/\/onboarding/, { timeout: 5000 })
+    await expect(page.getByText(/프로필 설정/i)).toBeVisible()
+
+    // 닉네임 입력 및 기본 플랫폼 설정
+    const nicknameInput = page.getByPlaceholderText(/닉네임/i)
+    await nicknameInput.fill('테스트 사용자')
+
+    const platformSelect = page.getByLabel(/주로 사용하는 음악 플랫폼/i)
+    await platformSelect.selectOption('spotify')
+
+    const startButton = page.getByRole('button', { name: /시작하기/i })
+    await startButton.click()
+
+    // Then: 보관함으로 이동 (편지가 자동으로 저장됨)
+    await expect(page).toHaveURL(/\/inbox/)
+    
+    // 데모 모드로 만든 편지가 보관함에 있는지 확인
+    await expect(page.getByText(/요즘 날씨가 추워지면서/i)).toBeVisible()
+  })
+
+  /**
+   * 테스트: 기존 사용자 플로우 (개선)
+   * 시나리오: 기존 사용자가 편지를 만들고 재생함
+   * Given: 사용자가 로그인되어 있음
+   * When: 편지 생성 페이지에서 편지를 만듦
+   * And: 완성 모달에서 완료 클릭
+   * Then: 보관함으로 이동
+   * And: 편지를 클릭하여 상세 페이지로 이동
+   * And: "전체 재생" 클릭 (기본 플랫폼으로 자동 재생)
+   */
+  test('should complete existing user flow with default platform', async ({ page }) => {
+    // Given: 로그인된 상태 (MSW로 모킹)
+    await page.goto('/login')
+    const googleLoginButton = page.getByRole('button', { name: /Google/i })
+    await googleLoginButton.click()
+    
+    // 온보딩 완료 (기본 플랫폼 설정 포함)
+    await page.waitForURL(/\/onboarding/, { timeout: 5000 })
+    const nicknameInput = page.getByPlaceholderText(/닉네임/i)
+    await nicknameInput.fill('기존 사용자')
+    
+    const platformSelect = page.getByLabel(/주로 사용하는 음악 플랫폼/i)
+    await platformSelect.selectOption('spotify')
+    
+    const startButton = page.getByRole('button', { name: /시작하기/i })
+    await startButton.click()
+
+    await expect(page).toHaveURL(/\/inbox/)
+
+    // When: 편지 생성
+    const createButton = page.getByRole('link', { name: /편지 만들기/i })
+    await createButton.click()
+
+    await expect(page).toHaveURL(/\/create/)
+
+    const searchInput = page.getByPlaceholderText(/곡.*검색/i)
+    await searchInput.fill('Song')
+    await page.waitForTimeout(500)
+
+    const addButton = page.getByRole('button', { name: /추가/i }).first()
+    await addButton.click()
+
+    const messageInput = page.getByPlaceholderText(/메시지/i)
+    await messageInput.fill('기존 사용자 테스트')
+
+    const completeButton = page.getByRole('button', { name: /완료.*공유/i })
+    await completeButton.click()
+
+    // 완료 버튼 클릭
+    const finishButton = page.getByRole('button', { name: /완료/i })
+    await finishButton.click()
+
+    // Then: 보관함으로 이동
+    await expect(page).toHaveURL(/\/inbox/)
+
+    // 편지 클릭
+    const letterCard = page.getByText(/기존 사용자 테스트/i)
+    await letterCard.click()
+
+    // 편지 상세 페이지에서 "전체 재생" 클릭
+    await expect(page).toHaveURL(/\/letters\/.+/)
+    const playButton = page.getByRole('button', { name: /전체 재생/i })
+    await playButton.click()
+
+    // 기본 플랫폼으로 자동 재생 (플랫폼 선택 모달 없음)
+    await page.waitForTimeout(1000)
+    await expect(page.getByText(/플랫폼 선택/i)).not.toBeVisible()
+  })
+})
+
