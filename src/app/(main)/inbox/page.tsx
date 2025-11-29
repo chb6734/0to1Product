@@ -199,20 +199,46 @@ export default function InboxPage() {
 
         {/* 편지 목록 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {letters.map((letter) => (
-            <LetterCard
-              key={letter.id}
-              sender={activeTab === "received" ? letter.sender : undefined}
-              recipient={activeTab === "sent" ? letter.recipient : undefined}
-              senderInitials={letter.senderInitials}
-              recipientInitials={letter.recipientInitials}
-              message={letter.message}
-              trackCount={letter.trackCount}
-              playCount={letter.playCount}
-              likeCount={letter.likeCount}
-              date={letter.date}
-            />
-          ))}
+          {letters.map((letter) => {
+            // sender가 객체인 경우 nickname 또는 email 추출
+            const senderName = 
+              typeof letter.sender === 'object' && letter.sender !== null
+                ? letter.sender.nickname || letter.sender.email || ''
+                : letter.sender || '';
+            
+            // recipient가 객체인 경우 nickname 또는 email 추출
+            const recipientName = 
+              typeof letter.recipient === 'object' && letter.recipient !== null
+                ? letter.recipient.nickname || letter.recipient.email || ''
+                : letter.recipient || '';
+            
+            // senderInitials 추출 (객체인 경우 nickname의 첫 글자)
+            const senderInitials = 
+              typeof letter.sender === 'object' && letter.sender !== null
+                ? letter.sender.nickname?.[0]?.toUpperCase() || letter.sender.email?.[0]?.toUpperCase() || ''
+                : letter.senderInitials || '';
+            
+            // recipientInitials 추출 (객체인 경우 nickname의 첫 글자)
+            const recipientInitials = 
+              typeof letter.recipient === 'object' && letter.recipient !== null
+                ? letter.recipient.nickname?.[0]?.toUpperCase() || letter.recipient.email?.[0]?.toUpperCase() || ''
+                : letter.recipientInitials || '';
+
+            return (
+              <LetterCard
+                key={letter.id}
+                sender={activeTab === "received" ? senderName : undefined}
+                recipient={activeTab === "sent" ? recipientName : undefined}
+                senderInitials={senderInitials}
+                recipientInitials={recipientInitials}
+                message={letter.message}
+                trackCount={letter.trackCount || letter.tracks?.length || 0}
+                playCount={letter.playCount || 0}
+                likeCount={letter.likeCount || 0}
+                date={letter.date || letter.createdAt || ''}
+              />
+            );
+          })}
         </div>
 
         {/* 빈 상태 */}
