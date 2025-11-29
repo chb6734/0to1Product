@@ -117,7 +117,9 @@ test.describe("Demo Mode Flow", () => {
     await expect(page).toHaveURL(/\/login/);
 
     // 로그인 완료 (MSW로 모킹)
-    const googleLoginButton = page.getByRole("button", { name: /Google 계정으로 계속하기/i });
+    const googleLoginButton = page.getByRole("button", {
+      name: /Google 계정으로 계속하기/i,
+    });
     await googleLoginButton.click();
 
     // 로그인 완료 후 온보딩 또는 보관함으로 이동 확인
