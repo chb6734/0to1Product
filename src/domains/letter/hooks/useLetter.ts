@@ -230,6 +230,7 @@ export function useLetter() {
         body: JSON.stringify({
           tracks: letter.tracks,
           message: letter.message,
+          imageUrl: letter.imageUrl,
         }),
       });
 

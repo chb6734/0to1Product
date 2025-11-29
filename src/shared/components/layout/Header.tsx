@@ -47,7 +47,7 @@ export function Header({
               ></div>
               <h1 className="text-lg font-bold text-white">FAN:STAGE</h1>
             </Link>
-            <nav className="hidden md:flex items-center px-10">
+            <nav className="flex items-center px-10">
               <Link
                 href="/inbox"
                 className={`text-base transition-colors ${
