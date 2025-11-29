@@ -1,32 +1,32 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
 /**
  * E2E 테스트: 사용자 인증 및 프로필
- * 
+ *
  * 기반: tests/scenarios/feature_auth.md
  * 작성자: Quinn QA
- * 
+ *
  * 테스트 목표:
  * - 소셜 로그인을 통한 가입 및 로그인 정상 동작 확인
  * - 프로필 수정 기능 정상 동작 확인
  * - 엣지 케이스 적절히 처리 확인
  */
 
-test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
+test.describe("사용자 인증 및 프로필 (feature_auth.md)", () => {
   test.beforeEach(async ({ page }) => {
     // 각 테스트 전에 로그인 페이지로 이동
-    await page.goto('/login');
+    await page.goto("/login");
   });
 
   /**
    * TC-AUTH-001: 신규 사용자 가입 (Google 소셜 로그인)
-   * 
+   *
    * 시나리오: 신규 사용자가 Google 계정으로 가입함
-   * 
+   *
    * Given:
    * - 사용자가 FAN:STAGE 웹사이트에 처음 방문함
    * - 사용자는 Google 계정을 보유하고 있음
-   * 
+   *
    * When:
    * 1. "시작하기" 버튼 클릭
    * 2. "Google로 로그인" 선택
@@ -34,18 +34,23 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
    * 4. 닉네임 입력 (예: "testuser")
    * 5. 프로필 이미지 선택 (선택적)
    * 6. "완료" 버튼 클릭
-   * 
+   *
    * Then:
    * - 사용자 계정이 생성됨
    * - 메인 화면으로 리다이렉트됨
    * - 사용자 프로필이 저장됨
    */
-  test('TC-AUTH-001: 신규 사용자 가입 (Google 소셜 로그인)', async ({ page, context }) => {
+  test("TC-AUTH-001: 신규 사용자 가입 (Google 소셜 로그인)", async ({
+    page,
+    context,
+  }) => {
     // 로그인 페이지가 정상 로드되었는지 확인
     await expect(page).toHaveTitle(/FAN:STAGE|FanStage/i);
-    
+
     // "Google 계정으로 계속하기" 버튼이 존재하는지 확인
-    const googleLoginButton = page.getByRole('button', { name: /Google 계정으로 계속하기/i });
+    const googleLoginButton = page.getByRole("button", {
+      name: /Google 계정으로 계속하기/i,
+    });
     await expect(googleLoginButton).toBeVisible();
     await expect(googleLoginButton).toBeEnabled();
 
@@ -65,9 +70,13 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
   /**
    * TC-AUTH-002: 신규 사용자 가입 (Kakao 소셜 로그인)
    */
-  test('TC-AUTH-002: 신규 사용자 가입 (Kakao 소셜 로그인)', async ({ page }) => {
+  test("TC-AUTH-002: 신규 사용자 가입 (Kakao 소셜 로그인)", async ({
+    page,
+  }) => {
     // "카카오로 계속하기" 버튼이 존재하는지 확인
-    const kakaoLoginButton = page.getByRole('button', { name: /카카오로 계속하기/i });
+    const kakaoLoginButton = page.getByRole("button", {
+      name: /카카오로 계속하기/i,
+    });
     await expect(kakaoLoginButton).toBeVisible();
     await expect(kakaoLoginButton).toBeEnabled();
 
@@ -79,9 +88,13 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
   /**
    * TC-AUTH-003: 신규 사용자 가입 (Apple 소셜 로그인)
    */
-  test('TC-AUTH-003: 신규 사용자 가입 (Apple 소셜 로그인)', async ({ page }) => {
+  test("TC-AUTH-003: 신규 사용자 가입 (Apple 소셜 로그인)", async ({
+    page,
+  }) => {
     // "Apple로 계속하기" 버튼이 존재하는지 확인
-    const appleLoginButton = page.getByRole('button', { name: /Apple로 계속하기/i });
+    const appleLoginButton = page.getByRole("button", {
+      name: /Apple로 계속하기/i,
+    });
     await expect(appleLoginButton).toBeVisible();
     await expect(appleLoginButton).toBeEnabled();
 
@@ -92,46 +105,51 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
 
   /**
    * TC-AUTH-E003: 닉네임 미입력 검증
-   * 
+   *
    * 시나리오: 닉네임을 입력하지 않고 완료 버튼 클릭
-   * 
+   *
    * Given: 사용자가 닉네임 입력 화면에 있음
    * When: 닉네임을 입력하지 않고 "완료" 버튼 클릭
    * Then:
    * - "닉네임을 입력해주세요" 에러 메시지 표시
    * - 닉네임 입력 필드에 포커스 이동
    */
-  test('TC-AUTH-E003: 닉네임 미입력 검증', async ({ page }) => {
+  test("TC-AUTH-E003: 닉네임 미입력 검증", async ({ page }) => {
     // Mock 인증 상태 설정 (localStorage에 사용자 정보 저장)
     await page.addInitScript(() => {
-      localStorage.setItem('fanstage_auth_user', JSON.stringify({
-        id: 'test-user-id',
-        email: 'test@example.com',
-        nickname: undefined, // 온보딩 필요
-      }));
+      localStorage.setItem(
+        "fanstage_auth_user",
+        JSON.stringify({
+          id: "test-user-id",
+          email: "test@example.com",
+          nickname: undefined, // 온보딩 필요
+        })
+      );
     });
 
     // 온보딩 페이지로 이동
-    await page.goto('/onboarding');
+    await page.goto("/onboarding");
 
     // 초기화 완료 대기
-    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /프로필 설정/i })
+    ).toBeVisible();
 
     // 닉네임 입력 필드 확인
     const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     await expect(nicknameInput).toBeVisible();
 
     // "시작하기" 버튼 확인 - 닉네임 미입력 시 비활성화되어야 함
-    const submitButton = page.getByRole('button', { name: /시작하기/i });
+    const submitButton = page.getByRole("button", { name: /시작하기/i });
     await expect(submitButton).toBeVisible();
     await expect(submitButton).toBeDisabled(); // 닉네임 미입력 시 비활성화
 
     // 닉네임 입력 후 버튼이 활성화되는지 확인
-    await nicknameInput.fill('테스트 닉네임');
+    await nicknameInput.fill("테스트 닉네임");
     await expect(submitButton).toBeEnabled();
 
     // 닉네임을 다시 비우면 버튼이 비활성화되는지 확인
-    await nicknameInput.fill('');
+    await nicknameInput.fill("");
     await expect(submitButton).toBeDisabled();
 
     // 페이지가 리다이렉트되지 않았는지 확인
@@ -141,17 +159,27 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
   /**
    * 로그인 페이지 UI 검증
    */
-  test('로그인 페이지 UI 요소 확인', async ({ page }) => {
+  test("로그인 페이지 UI 요소 확인", async ({ page }) => {
     // 페이지 제목 확인
-    await expect(page.getByRole('heading', { name: /FAN:STAGE에 오신 것을 환영합니다/i })).toBeVisible();
-    
+    await expect(
+      page.getByRole("heading", { name: /FAN:STAGE에 오신 것을 환영합니다/i })
+    ).toBeVisible();
+
     // 설명 텍스트 확인
-    await expect(page.getByText(/소셜 계정으로 간편하게 시작하세요/i)).toBeVisible();
+    await expect(
+      page.getByText(/소셜 계정으로 간편하게 시작하세요/i)
+    ).toBeVisible();
 
     // 소셜 로그인 버튼 3개 모두 확인
-    await expect(page.getByRole('button', { name: /Google 계정으로 계속하기/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /카카오로 계속하기/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Apple로 계속하기/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Google 계정으로 계속하기/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /카카오로 계속하기/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Apple로 계속하기/i })
+    ).toBeVisible();
 
     // 이용약관 안내 텍스트 확인
     await expect(page.getByText(/이용약관/i)).toBeVisible();
@@ -161,64 +189,83 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
   /**
    * 온보딩 페이지 UI 검증
    */
-  test('온보딩 페이지 UI 요소 확인', async ({ page }) => {
+  test("온보딩 페이지 UI 요소 확인", async ({ page }) => {
     // Mock 인증 상태 설정
     await page.addInitScript(() => {
-      localStorage.setItem('fanstage_auth_user', JSON.stringify({
-        id: 'test-user-id',
-        email: 'test@example.com',
-        nickname: undefined, // 온보딩 필요
-      }));
+      localStorage.setItem(
+        "fanstage_auth_user",
+        JSON.stringify({
+          id: "test-user-id",
+          email: "test@example.com",
+          nickname: undefined, // 온보딩 필요
+        })
+      );
     });
 
     // 온보딩 페이지로 이동
-    await page.goto('/onboarding');
+    await page.goto("/onboarding");
 
     // 초기화 완료 대기
-    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /프로필 설정/i })
+    ).toBeVisible();
 
     // 페이지 제목 확인
-    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
-    await expect(page.getByText(/닉네임과 프로필 사진을 설정해주세요/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /프로필 설정/i })
+    ).toBeVisible();
+    await expect(
+      page.getByText(/닉네임과 프로필 사진을 설정해주세요/i)
+    ).toBeVisible();
 
     // 프로필 사진 업로드 영역 확인
-    await expect(page.getByText(/프로필 사진.*선택/i)).toBeVisible();
+    await expect(page.getByText("프로필 사진 (선택)")).toBeVisible();
 
     // 닉네임 입력 필드 확인
     const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     await expect(nicknameInput).toBeVisible();
-    await expect(nicknameInput).toHaveAttribute('maxLength', '20');
+    await expect(nicknameInput).toHaveAttribute("maxLength", "20");
 
     // 기본 플랫폼 설정 필드 확인 (PRD v4)
-    const platformSelect = page.getByLabel(/주로 사용하는 음악 플랫폼/i);
+    // label과 select가 연결되어 있으므로 label 텍스트로 찾기
+    const platformLabel = page.getByText(/주로 사용하는 음악 플랫폼/i);
+    await expect(platformLabel).toBeVisible();
+    
+    // select 요소 확인 (label 다음에 있는 select)
+    const platformSelect = page.locator('select').filter({ hasText: /없음.*나중에 설정/i });
     await expect(platformSelect).toBeVisible();
 
     // 시작하기 버튼 확인
-    await expect(page.getByRole('button', { name: /시작하기/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /시작하기/i })).toBeVisible();
   });
 
   /**
    * 닉네임 길이 제한 검증
    */
-  test('닉네임 길이 제한 검증', async ({ page }) => {
+  test("닉네임 길이 제한 검증", async ({ page }) => {
     // Mock 인증 상태 설정
     await page.addInitScript(() => {
-      localStorage.setItem('fanstage_auth_user', JSON.stringify({
-        id: 'test-user-id',
-        email: 'test@example.com',
-        nickname: undefined, // 온보딩 필요
-      }));
+      localStorage.setItem(
+        "fanstage_auth_user",
+        JSON.stringify({
+          id: "test-user-id",
+          email: "test@example.com",
+          nickname: undefined, // 온보딩 필요
+        })
+      );
     });
 
-    await page.goto('/onboarding');
+    await page.goto("/onboarding");
 
     // 초기화 완료 대기
-    await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /프로필 설정/i })
+    ).toBeVisible();
 
     const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
-    
+
     // 20자 초과 입력 시도
-    const longNickname = 'a'.repeat(21);
+    const longNickname = "a".repeat(21);
     await nicknameInput.fill(longNickname);
 
     // maxLength 속성으로 인해 20자까지만 입력되어야 함
@@ -229,4 +276,3 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     await expect(page.getByText(/20\/20/i)).toBeVisible();
   });
 });
-
