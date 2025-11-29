@@ -13,6 +13,7 @@ const DRAFT_STORAGE_KEY = 'fanstage_letter_draft'
 export interface LetterDraft {
   tracks: Array<{ id: string; title: string; artist: string }>
   message: string
+  imageUrl?: string
   savedAt: string
 }
 

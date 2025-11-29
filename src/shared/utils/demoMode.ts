@@ -11,6 +11,7 @@
 export interface DemoLetterData {
   tracks: Array<{ id: string; title: string; artist: string }>
   message: string
+  imageUrl?: string
   isPrivate: boolean
 }
 

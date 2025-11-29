@@ -1,159 +1,173 @@
 /**
  * Mock 데이터 생성 함수
- * 
+ *
  * 목적: 테스트 및 개발용 Mock 데이터 생성
  */
-import { MockUser, MockTrack, MockLetter, MockPlaylist } from './types'
+import { MockUser, MockTrack, MockLetter, MockPlaylist } from "./types";
 
 // 샘플 사용자 데이터
 export const mockUsers: MockUser[] = [
   {
-    id: 'user-1',
-    email: 'user1@example.com',
-    nickname: '음악러버',
-    profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user1',
-    createdAt: '2024-01-01T00:00:00Z',
+    id: "user-1",
+    email: "user1@example.com",
+    nickname: "음악러버",
+    profileImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=user1",
+    createdAt: "2024-01-01T00:00:00Z",
   },
   {
-    id: 'user-2',
-    email: 'user2@example.com',
-    nickname: '플레이리스트마스터',
-    profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user2',
-    createdAt: '2024-01-02T00:00:00Z',
+    id: "user-2",
+    email: "user2@example.com",
+    nickname: "플레이리스트마스터",
+    profileImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=user2",
+    createdAt: "2024-01-02T00:00:00Z",
   },
-]
+];
 
 // 샘플 곡 데이터
 export const mockTracks: MockTrack[] = [
   {
-    id: 'track-1',
-    title: 'Blinding Lights',
-    artist: 'The Weeknd',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:0VjIjW4GlU5UT31H5q5X',
+    id: "track-1",
+    title: "Blinding Lights",
+    artist: "The Weeknd",
+    albumCover:
+      "https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36",
+    platform: "spotify",
+    platformTrackId: "spotify:track:0VjIjW4GlU5UT31H5q5X",
     duration: 200000,
   },
   {
-    id: 'track-2',
-    title: 'Shape of You',
-    artist: 'Ed Sheeran',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273ba5db46f4b838ef6027e6f96',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:7qiZfU4dY1lWllzX7mP',
+    id: "track-2",
+    title: "Shape of You",
+    artist: "Ed Sheeran",
+    albumCover:
+      "https://i.scdn.co/image/ab67616d0000b273ba5db46f4b838ef6027e6f96",
+    platform: "spotify",
+    platformTrackId: "spotify:track:7qiZfU4dY1lWllzX7mP",
     duration: 233000,
   },
   {
-    id: 'track-3',
-    title: 'Watermelon Sugar',
-    artist: 'Harry Styles',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273e787cffec20aa2a396a61647',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:6UelLqGlWMcVH1E5c4H7lY',
+    id: "track-3",
+    title: "Watermelon Sugar",
+    artist: "Harry Styles",
+    albumCover:
+      "https://i.scdn.co/image/ab67616d0000b273e787cffec20aa2a396a61647",
+    platform: "spotify",
+    platformTrackId: "spotify:track:6UelLqGlWMcVH1E5c4H7lY",
     duration: 174000,
   },
   {
-    id: 'track-4',
-    title: 'Dynamite',
-    artist: 'BTS',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273d9194aa18fa4c9362b3c1bde',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:4saklk6nie3yiGePpBwUoc',
+    id: "track-4",
+    title: "Dynamite",
+    artist: "BTS",
+    albumCover:
+      "https://i.scdn.co/image/ab67616d0000b273d9194aa18fa4c9362b3c1bde",
+    platform: "spotify",
+    platformTrackId: "spotify:track:4saklk6nie3yiGePpBwUoc",
     duration: 199000,
   },
   {
-    id: 'track-5',
-    title: 'Levitating',
-    artist: 'Dua Lipa',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b27350a3147b4ede2074708f8748',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:463CkQjx2Zk1yXoBuierM9',
+    id: "track-5",
+    title: "Levitating",
+    artist: "Dua Lipa",
+    albumCover:
+      "https://i.scdn.co/image/ab67616d0000b27350a3147b4ede2074708f8748",
+    platform: "spotify",
+    platformTrackId: "spotify:track:463CkQjx2Zk1yXoBuierM9",
     duration: 203000,
   },
   {
-    id: 'track-6',
-    title: '겨울 노래',
-    artist: '겨울 아티스트',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273dummy',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:winter-song',
+    id: "track-6",
+    title: "겨울 노래",
+    artist: "겨울 아티스트",
+    albumCover: "https://i.scdn.co/image/ab67616d0000b273dummy",
+    platform: "spotify",
+    platformTrackId: "spotify:track:winter-song",
     duration: 240000,
   },
   {
-    id: 'track-7',
-    title: 'Song',
-    artist: 'Test Artist',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273dummy',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:test-song',
+    id: "track-7",
+    title: "Song",
+    artist: "Test Artist",
+    albumCover: "https://i.scdn.co/image/ab67616d0000b273dummy",
+    platform: "spotify",
+    platformTrackId: "spotify:track:test-song",
     duration: 200000,
   },
   {
-    id: 'track-8',
-    title: '크리스마스',
-    artist: '크리스마스 아티스트',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273dummy',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:christmas-song',
+    id: "track-8",
+    title: "크리스마스",
+    artist: "크리스마스 아티스트",
+    albumCover: "https://i.scdn.co/image/ab67616d0000b273dummy",
+    platform: "spotify",
+    platformTrackId: "spotify:track:christmas-song",
     duration: 220000,
   },
   {
-    id: 'track-9',
-    title: '눈',
-    artist: '눈 아티스트',
-    albumCover: 'https://i.scdn.co/image/ab67616d0000b273dummy',
-    platform: 'spotify',
-    platformTrackId: 'spotify:track:snow-song',
+    id: "track-9",
+    title: "눈",
+    artist: "눈 아티스트",
+    albumCover: "https://i.scdn.co/image/ab67616d0000b273dummy",
+    platform: "spotify",
+    platformTrackId: "spotify:track:snow-song",
     duration: 210000,
   },
-]
+];
 
 // 샘플 편지 데이터 (동적으로 수정 가능하도록 let 사용)
 export let mockLetters: MockLetter[] = [
   {
-    id: 'letter-1',
-    senderId: 'user-1',
+    id: "letter-1",
+    senderId: "user-1",
     sender: mockUsers[0],
-    recipientEmail: 'friend@example.com',
-    message: '생일 축하해! 이 곡들을 들으면서 행복한 하루 보내길 바라!',
+    recipientEmail: "friend@example.com",
+    message: "생일 축하해! 이 곡들을 들으면서 행복한 하루 보내길 바라!",
     tracks: [mockTracks[0], mockTracks[1]],
-    shareToken: 'share-token-1',
-    createdAt: '2024-01-10T10:00:00Z',
-    updatedAt: '2024-01-10T10:00:00Z',
+    shareToken: "share-token-1",
+    createdAt: "2024-01-10T10:00:00Z",
+    updatedAt: "2024-01-10T10:00:00Z",
   },
   {
-    id: 'letter-2',
-    senderId: 'user-2',
+    id: "letter-2",
+    senderId: "user-2",
     sender: mockUsers[1],
-    recipientEmail: 'colleague@example.com',
-    message: '오늘 하루 힘들었을 것 같아서 위로의 플레이리스트를 만들어봤어.',
+    recipientEmail: "colleague@example.com",
+    message: "오늘 하루 힘들었을 것 같아서 위로의 플레이리스트를 만들어봤어.",
     tracks: [mockTracks[2]],
-    shareToken: 'share-token-2',
-    createdAt: '2024-01-11T15:30:00Z',
-    updatedAt: '2024-01-11T15:30:00Z',
+    shareToken: "share-token-2",
+    createdAt: "2024-01-11T15:30:00Z",
+    updatedAt: "2024-01-11T15:30:00Z",
   },
-]
+];
 
 // Mock 데이터 생성 헬퍼 함수
 export function createMockUser(overrides?: Partial<MockUser>): MockUser {
-  const id = overrides?.id || `user-${Date.now()}`
-  const email = overrides?.email || `user${Date.now()}@example.com`
-  
+  const id = overrides?.id || `user-${Date.now()}`;
+  const email = overrides?.email || `user${Date.now()}@example.com`;
+
   // nickname 처리: 명시적으로 undefined가 전달되면 undefined 유지
   // overrides에 nickname 속성이 없으면 기본값 사용
-  let nickname: string | undefined
-  if (overrides && 'nickname' in overrides) {
+  let nickname: string | undefined;
+  if (overrides && "nickname" in overrides) {
     // nickname 속성이 명시적으로 전달됨 (undefined 포함)
-    nickname = overrides.nickname
-    console.log('[createMockUser] nickname 속성 존재, 값:', nickname, '타입:', typeof nickname, '=== undefined:', nickname === undefined)
+    nickname = overrides.nickname;
+    console.log(
+      "[createMockUser] nickname 속성 존재, 값:",
+      nickname,
+      "타입:",
+      typeof nickname,
+      "=== undefined:",
+      nickname === undefined
+    );
   } else {
     // nickname 속성이 없으면 기본값 생성
-    nickname = `User${Date.now()}`
-    console.log('[createMockUser] nickname 속성 없음, 기본값 생성:', nickname)
+    nickname = `User${Date.now()}`;
+    console.log("[createMockUser] nickname 속성 없음, 기본값 생성:", nickname);
   }
-  
-  const profileImage = overrides?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`
-  const createdAt = overrides?.createdAt || new Date().toISOString()
+
+  const profileImage =
+    overrides?.profileImage ||
+    `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`;
+  const createdAt = overrides?.createdAt || new Date().toISOString();
 
   const user: MockUser = {
     id,
@@ -161,37 +175,41 @@ export function createMockUser(overrides?: Partial<MockUser>): MockUser {
     nickname, // undefined일 수 있음
     profileImage,
     createdAt,
-  }
-  
-  console.log('[createMockUser] 최종 user 객체:', user)
-  console.log('[createMockUser] 최종 user.nickname:', user.nickname, '=== undefined:', user.nickname === undefined)
-  
-  return user
+  };
+
+  console.log("[createMockUser] 최종 user 객체:", user);
+  console.log(
+    "[createMockUser] 최종 user.nickname:",
+    user.nickname,
+    "=== undefined:",
+    user.nickname === undefined
+  );
+
+  return user;
 }
 
 export function createMockTrack(overrides?: Partial<MockTrack>): MockTrack {
   return {
     id: `track-${Date.now()}`,
-    title: 'Mock Track',
-    artist: 'Mock Artist',
-    albumCover: 'https://via.placeholder.com/300',
-    platform: 'spotify',
+    title: "Mock Track",
+    artist: "Mock Artist",
+    albumCover: "https://via.placeholder.com/300",
+    platform: "spotify",
     platformTrackId: `spotify:track:${Date.now()}`,
     ...overrides,
-  }
+  };
 }
 
 export function createMockLetter(overrides?: Partial<MockLetter>): MockLetter {
   return {
     id: `letter-${Date.now()}`,
-    senderId: 'user-1',
-    message: '',
+    senderId: "user-1",
+    message: "",
     tracks: [],
     shareToken: `share-token-${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     imageUrl: undefined,
     ...overrides,
-  }
+  };
 }
-
