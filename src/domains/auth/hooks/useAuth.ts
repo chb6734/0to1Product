@@ -16,6 +16,7 @@ interface User {
   email: string;
   nickname?: string;
   profileImage?: string;
+  defaultPlatform?: 'spotify' | 'apple' | 'youtube' | 'melon' | null;
 }
 
 interface ProfileData {

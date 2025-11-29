@@ -17,13 +17,15 @@ import { http, HttpResponse } from 'msw'
 import { server } from '@/mocks/server'
 
 // useAuth 모킹
+const mockUser = {
+  id: 'user-1',
+  email: 'test@example.com',
+  defaultPlatform: null as 'spotify' | 'apple' | 'youtube' | 'melon' | null,
+}
+
 vi.mock('../hooks/useAuth', () => ({
   useAuth: vi.fn(() => ({
-    user: {
-      id: 'user-1',
-      email: 'test@example.com',
-      defaultPlatform: null,
-    },
+    user: mockUser,
   })),
 }))
 
@@ -40,6 +42,20 @@ describe('useDefaultPlatform', () => {
    * Then: 사용자 프로필에 defaultPlatform이 저장됨
    */
   it('should set default platform', async () => {
+    // MSW 핸들러 설정
+    server.use(
+      http.put('/api/auth/profile', async ({ request }) => {
+        const body = await request.json() as { defaultPlatform?: string }
+        mockUser.defaultPlatform = body.defaultPlatform as 'spotify' | null
+        return HttpResponse.json({
+          user: {
+            ...mockUser,
+            defaultPlatform: body.defaultPlatform,
+          },
+        })
+      })
+    )
+
     const { result } = renderHook(() => useDefaultPlatform())
 
     await act(async () => {
@@ -60,17 +76,7 @@ describe('useDefaultPlatform', () => {
    */
   it('should get default platform', async () => {
     // 프로필에 기본 플랫폼이 설정되어 있다고 가정
-    server.use(
-      http.get('/api/auth/user', () => {
-        return HttpResponse.json({
-          user: {
-            id: 'user-1',
-            email: 'test@example.com',
-            defaultPlatform: 'spotify',
-          },
-        })
-      })
-    )
+    mockUser.defaultPlatform = 'spotify'
 
     const { result } = renderHook(() => useDefaultPlatform())
 
@@ -87,6 +93,20 @@ describe('useDefaultPlatform', () => {
    * Then: 기본 플랫폼이 업데이트됨
    */
   it('should update default platform', async () => {
+    // MSW 핸들러 설정
+    server.use(
+      http.put('/api/auth/profile', async ({ request }) => {
+        const body = await request.json() as { defaultPlatform?: string }
+        mockUser.defaultPlatform = body.defaultPlatform as 'spotify' | 'apple' | null
+        return HttpResponse.json({
+          user: {
+            ...mockUser,
+            defaultPlatform: body.defaultPlatform,
+          },
+        })
+      })
+    )
+
     const { result } = renderHook(() => useDefaultPlatform())
 
     await act(async () => {
@@ -114,17 +134,7 @@ describe('useDefaultPlatform', () => {
    * Then: null을 반환함
    */
   it('should return null when default platform is not set', async () => {
-    server.use(
-      http.get('/api/auth/user', () => {
-        return HttpResponse.json({
-          user: {
-            id: 'user-1',
-            email: 'test@example.com',
-            defaultPlatform: null,
-          },
-        })
-      })
-    )
+    mockUser.defaultPlatform = null
 
     const { result } = renderHook(() => useDefaultPlatform())
 

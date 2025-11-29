@@ -46,6 +46,13 @@ export default function Home() {
           {/* 버튼 */}
           <div className="flex flex-wrap gap-4">
             <Link
+              href="/create?demo=true"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+            >
+              로그인 없이 체험하기
+            </Link>
+            <Link
               href="/create"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
               style={{ backgroundColor: "#FFE11D", color: "#000000" }}
