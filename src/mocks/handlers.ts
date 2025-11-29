@@ -98,21 +98,6 @@ const authHandlers = [
     return HttpResponse.json({ user: mockUsers[0] })
   }),
 
-  // 프로필 수정
-  http.put('/api/auth/profile', async ({ request }) => {
-    await delay(400)
-    const body = await request.json() as Partial<MockUser>
-    if (body.nickname === 'duplicate') {
-      return HttpResponse.json({ error: '이미 사용 중인 닉네임입니다' }, { status: 409 })
-    }
-    const updatedUser = {
-      ...mockUsers[0],
-      ...body,
-      updatedAt: new Date().toISOString(),
-    }
-    return HttpResponse.json({ user: updatedUser })
-  }),
-
   // 프로필 업데이트 (nickname, profileImage, defaultPlatform 모두 처리)
   http.put('/api/auth/profile', async ({ request }) => {
     await delay(400)
@@ -120,6 +105,11 @@ const authHandlers = [
       nickname?: string
       profileImage?: string
       defaultPlatform?: string 
+    }
+    
+    // 중복 닉네임 체크
+    if (body.nickname === 'duplicate') {
+      return HttpResponse.json({ error: '이미 사용 중인 닉네임입니다' }, { status: 409 })
     }
     
     // 현재 사용자 정보 가져오기 (localStorage에서 가져온다고 가정)
