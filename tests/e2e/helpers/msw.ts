@@ -65,13 +65,22 @@ const server = setupServer(
 
   // 프로필 업데이트 API Mock
   http.put('/api/auth/profile', async ({ request }) => {
-    const body = await request.json() as { nickname?: string; profileImage?: string };
+    const body = await request.json() as { 
+      nickname?: string; 
+      profileImage?: string;
+      defaultPlatform?: string | null;
+    };
     const user = createMockUser({
       email: 'test@example.com',
       nickname: body.nickname,
       profileImage: body.profileImage,
     });
-    return HttpResponse.json({ user });
+    // defaultPlatform 추가
+    const userWithPlatform = {
+      ...user,
+      defaultPlatform: body.defaultPlatform !== undefined ? body.defaultPlatform : undefined,
+    };
+    return HttpResponse.json({ user: userWithPlatform });
   }),
 
   // 로그아웃 API Mock
@@ -161,13 +170,22 @@ const server = setupServer(
 
   // 프로필 업데이트 API Mock
   http.put('/api/auth/profile', async ({ request }) => {
-    const body = await request.json() as { nickname?: string; profileImage?: string };
+    const body = await request.json() as { 
+      nickname?: string; 
+      profileImage?: string;
+      defaultPlatform?: string | null;
+    };
     const user = createMockUser({
       email: 'test@example.com',
       nickname: body.nickname,
       profileImage: body.profileImage,
     });
-    return HttpResponse.json({ user });
+    // defaultPlatform 추가
+    const userWithPlatform = {
+      ...user,
+      defaultPlatform: body.defaultPlatform !== undefined ? body.defaultPlatform : undefined,
+    };
+    return HttpResponse.json({ user: userWithPlatform });
   }),
 
   // 로그아웃 API Mock
