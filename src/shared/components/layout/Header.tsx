@@ -31,7 +31,7 @@ export function Header({
               ></div>
               <h1 className="text-lg font-bold text-white">FAN:STAGE</h1>
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
+            <nav className="hidden md:flex items-center px-10">
               <Link
                 href="/inbox"
                 className={`text-base transition-colors ${
@@ -39,6 +39,7 @@ export function Header({
                     ? "text-white font-medium"
                     : "text-gray-400 hover:text-white"
                 }`}
+                style={{ marginRight: "24px" }}
               >
                 보관함
               </Link>
@@ -105,4 +106,3 @@ export function Header({
     </header>
   );
 }
-
