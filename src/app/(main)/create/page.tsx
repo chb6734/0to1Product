@@ -374,13 +374,14 @@ export default function CreateLetterPage() {
     setIsCompletionModalOpen(false);
   };
 
-  // 완료 (보관함으로 이동)
+  // 완료 (보관함으로 이동 - 보낸 편지 탭으로)
   const handleCompleteClick = async () => {
     if (demoMode) {
       // 데모 모드에서 로그인 전환
       router.push("/login");
     } else {
-      router.push("/inbox");
+      // 편지 생성 완료 후 보낸 편지 탭으로 이동
+      router.push("/inbox?tab=sent");
     }
   };
 

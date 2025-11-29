@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/shared/components/layout/Header";
 import { LetterCard } from "@/domains/letter/components/LetterCard";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
@@ -22,7 +22,13 @@ import { formatDateToKorean } from "@/shared/utils/dateFormat";
 
 export default function InboxPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
+  const searchParams = useSearchParams();
+  
+  // URL 쿼리 파라미터에서 탭 정보 가져오기
+  const tabFromQuery = searchParams.get("tab");
+  const initialTab = (tabFromQuery === "sent" ? "sent" : "received") as "received" | "sent";
+  
+  const [activeTab, setActiveTab] = useState<"received" | "sent">(initialTab);
   const { user, isAuthenticated, isInitializing } = useAuth();
   const { createLetter } = useLetter();
   const [letters, setLetters] = useState<any[]>([]);
@@ -34,6 +40,14 @@ export default function InboxPage() {
       router.push("/login");
     }
   }, [isAuthenticated, isInitializing, router]);
+
+  // URL 쿼리 파라미터 변경 시 탭 업데이트
+  useEffect(() => {
+    const tabFromQuery = searchParams.get("tab");
+    if (tabFromQuery === "sent" || tabFromQuery === "received") {
+      setActiveTab(tabFromQuery);
+    }
+  }, [searchParams]);
 
   // 정렬/필터 상태 (P1)
   const [sortOption, setSortOption] = useState<SortOption>("date-desc");
