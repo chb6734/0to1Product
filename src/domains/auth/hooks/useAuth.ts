@@ -46,7 +46,7 @@ export function useAuth() {
     return null;
   });
 
-  // localStorage 변경 감지
+  // localStorage 변경 감지 (다른 탭이나 컴포넌트에서 발생한 변경만 감지)
   useEffect(() => {
     if (typeof window === "undefined") return;
     
@@ -55,20 +55,46 @@ export function useAuth() {
         const stored = localStorage.getItem(AUTH_STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          setUser(parsed);
+          // 현재 user 상태와 비교하여 다를 때만 업데이트 (무한 루프 방지)
+          setUser((currentUser) => {
+            if (JSON.stringify(currentUser) === JSON.stringify(parsed)) {
+              return currentUser; // 동일하면 업데이트하지 않음
+            }
+            return parsed;
+          });
+        } else {
+          // localStorage가 비어있으면 user도 null로 설정
+          setUser((currentUser) => {
+            if (currentUser === null) {
+              return currentUser; // 이미 null이면 업데이트하지 않음
+            }
+            return null;
+          });
         }
       } catch (error) {
         console.error("[useAuth] storage 이벤트 처리 실패:", error);
       }
     };
 
+    // 'storage' 이벤트는 다른 탭에서 발생한 변경만 감지 (같은 탭에서는 발생하지 않음)
     window.addEventListener('storage', handleStorageChange);
-    // 커스텀 이벤트도 감지 (같은 탭에서 발생하는 localStorage 변경)
-    window.addEventListener('localStorageChange', handleStorageChange);
+    
+    // 커스텀 이벤트는 다른 컴포넌트에서 발생한 변경 감지용
+    // 하지만 같은 컴포넌트에서 발생한 이벤트는 무시하기 위해 플래그 사용
+    let isInternalUpdate = false;
+    const handleLocalStorageChange = () => {
+      if (isInternalUpdate) {
+        isInternalUpdate = false;
+        return; // 내부 업데이트는 무시
+      }
+      handleStorageChange();
+    };
+
+    window.addEventListener('localStorageChange', handleLocalStorageChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('localStorageChange', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleLocalStorageChange);
     };
   }, []);
 
@@ -86,28 +112,32 @@ export function useAuth() {
   const [error, setError] = useState<Error | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // user 상태 변경 시 localStorage에 저장
+  // user 상태 변경 시 localStorage에 저장 (무한 루프 방지)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if (user) {
-      try {
+    // 현재 localStorage의 값과 비교하여 다를 때만 저장
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      const storedUser = stored ? JSON.parse(stored) : null;
+      
+      // 현재 user와 localStorage의 값이 같으면 저장하지 않음 (무한 루프 방지)
+      if (JSON.stringify(user) === JSON.stringify(storedUser)) {
+        return;
+      }
+
+      if (user) {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
         console.log("[useAuth] localStorage에 사용자 정보 저장:", user);
-        // 다른 컴포넌트에 변경사항 알림
-        window.dispatchEvent(new Event('localStorageChange'));
-      } catch (error) {
-        console.error("[useAuth] localStorage 저장 실패:", error);
-      }
-    } else {
-      try {
+      } else {
         localStorage.removeItem(AUTH_STORAGE_KEY);
         console.log("[useAuth] localStorage에서 사용자 정보 제거");
-        // 다른 컴포넌트에 변경사항 알림
-        window.dispatchEvent(new Event('localStorageChange'));
-      } catch (error) {
-        console.error("[useAuth] localStorage 제거 실패:", error);
       }
+      
+      // 다른 컴포넌트에 변경사항 알림 (같은 컴포넌트의 이벤트 리스너는 무시됨)
+      window.dispatchEvent(new Event('localStorageChange'));
+    } catch (error) {
+      console.error("[useAuth] localStorage 저장 실패:", error);
     }
   }, [user]);
 
