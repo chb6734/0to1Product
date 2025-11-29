@@ -23,7 +23,7 @@ test.describe('Default Platform Setting', () => {
   test('should set default platform during onboarding', async ({ page }) => {
     // Given: 온보딩 페이지 진입 (로그인 후)
     await page.goto('/login')
-    const googleLoginButton = page.getByRole('button', { name: /Google/i })
+    const googleLoginButton = page.getByRole('button', { name: /Google 계정으로 계속하기/i })
     await googleLoginButton.click()
     
     // 로그인 완료 후 온보딩 페이지로 이동

@@ -44,8 +44,8 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     // 로그인 페이지가 정상 로드되었는지 확인
     await expect(page).toHaveTitle(/FAN:STAGE|FanStage/i);
     
-    // "Google로 로그인" 버튼이 존재하는지 확인
-    const googleLoginButton = page.getByRole('button', { name: /Google로 로그인/i });
+    // "Google 계정으로 계속하기" 버튼이 존재하는지 확인
+    const googleLoginButton = page.getByRole('button', { name: /Google 계정으로 계속하기/i });
     await expect(googleLoginButton).toBeVisible();
     await expect(googleLoginButton).toBeEnabled();
 
@@ -66,8 +66,8 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
    * TC-AUTH-002: 신규 사용자 가입 (Kakao 소셜 로그인)
    */
   test('TC-AUTH-002: 신규 사용자 가입 (Kakao 소셜 로그인)', async ({ page }) => {
-    // "Kakao로 로그인" 버튼이 존재하는지 확인
-    const kakaoLoginButton = page.getByRole('button', { name: /Kakao로 로그인/i });
+    // "카카오로 계속하기" 버튼이 존재하는지 확인
+    const kakaoLoginButton = page.getByRole('button', { name: /카카오로 계속하기/i });
     await expect(kakaoLoginButton).toBeVisible();
     await expect(kakaoLoginButton).toBeEnabled();
 
@@ -80,8 +80,8 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
    * TC-AUTH-003: 신규 사용자 가입 (Apple 소셜 로그인)
    */
   test('TC-AUTH-003: 신규 사용자 가입 (Apple 소셜 로그인)', async ({ page }) => {
-    // "Apple로 로그인" 버튼이 존재하는지 확인
-    const appleLoginButton = page.getByRole('button', { name: /Apple로 로그인/i });
+    // "Apple로 계속하기" 버튼이 존재하는지 확인
+    const appleLoginButton = page.getByRole('button', { name: /Apple로 계속하기/i });
     await expect(appleLoginButton).toBeVisible();
     await expect(appleLoginButton).toBeEnabled();
 
@@ -118,17 +118,17 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     await page.waitForSelector('text=프로필 설정', { timeout: 10000 });
 
     // 닉네임 입력 필드 확인
-    const nicknameInput = page.getByLabel(/닉네임/i);
+    const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     await expect(nicknameInput).toBeVisible();
 
     // 폼 요소 찾기
     const form = page.locator('form');
     await expect(form).toBeVisible();
 
-    // "완료" 버튼 확인
-    const submitButton = page.getByRole('button', { name: /완료/i });
+    // "시작하기" 버튼 확인
+    const submitButton = page.getByRole('button', { name: /시작하기/i });
     await expect(submitButton).toBeVisible();
-    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeDisabled(); // 닉네임 미입력 시 비활성화
 
     // 폼 제출 (submit 이벤트 직접 트리거)
     await form.evaluate((form) => {
@@ -152,18 +152,19 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
    */
   test('로그인 페이지 UI 요소 확인', async ({ page }) => {
     // 페이지 제목 확인
-    await expect(page.getByRole('heading', { name: /FAN:STAGE/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /FAN:STAGE에 오신 것을 환영합니다/i })).toBeVisible();
     
     // 설명 텍스트 확인
-    await expect(page.getByText(/음악으로 모인 사람들이/i)).toBeVisible();
+    await expect(page.getByText(/소셜 계정으로 간편하게 시작하세요/i)).toBeVisible();
 
     // 소셜 로그인 버튼 3개 모두 확인
-    await expect(page.getByRole('button', { name: /Google로 로그인/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Kakao로 로그인/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Apple로 로그인/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Google 계정으로 계속하기/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /카카오로 계속하기/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Apple로 계속하기/i })).toBeVisible();
 
     // 이용약관 안내 텍스트 확인
-    await expect(page.getByText(/이용약관 및 개인정보처리방침/i)).toBeVisible();
+    await expect(page.getByText(/이용약관/i)).toBeVisible();
+    await expect(page.getByText(/개인정보처리방침/i)).toBeVisible();
   });
 
   /**
@@ -189,7 +190,7 @@ test.describe('사용자 인증 및 프로필 (feature_auth.md)', () => {
     await expect(page.getByRole('heading', { name: /프로필 설정/i })).toBeVisible();
 
     // 닉네임 입력 필드 확인
-    const nicknameInput = page.getByLabel(/닉네임/i);
+    const nicknameInput = page.getByPlaceholder(/닉네임을 입력하세요/i);
     await expect(nicknameInput).toBeVisible();
     await expect(nicknameInput).toHaveAttribute('maxLength', '20');
 

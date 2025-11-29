@@ -72,7 +72,7 @@ test.describe("Full User Journey v4", () => {
     await expect(page).toHaveURL(/\/login/);
 
     // 로그인 완료
-    const googleLoginButton = page.getByRole("button", { name: /Google/i });
+    const googleLoginButton = page.getByRole("button", { name: /Google 계정으로 계속하기/i });
     await googleLoginButton.click();
 
     // 온보딩 페이지로 이동
@@ -121,7 +121,7 @@ test.describe("Full User Journey v4", () => {
   }) => {
     // Given: 로그인된 상태 (MSW로 모킹)
     await page.goto("/login");
-    const googleLoginButton = page.getByRole("button", { name: /Google/i });
+    const googleLoginButton = page.getByRole("button", { name: /Google 계정으로 계속하기/i });
     await googleLoginButton.click();
 
     // 온보딩 완료 (기본 플랫폼 설정 포함)
