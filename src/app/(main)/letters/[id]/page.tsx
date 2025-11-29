@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/shared/components/layout/Header";
 import { ProfileAvatarGradient } from "@/shared/components/ui/ProfileAvatarGradient";
@@ -20,36 +20,80 @@ export default function LetterDetailPage({
   const router = useRouter();
   const { defaultPlatform } = useDefaultPlatform();
   const [isPlatformModalOpen, setIsPlatformModalOpen] = useState(false);
+  const [letter, setLetter] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 예시 데이터
-  const letter = {
-    id: params.id,
-    sender: "김서연",
-    senderInitials: "KS",
-    date: "2일 전",
-    message:
-      "요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요. 추운 겨울밤, 창밖을 보며 들으면 정말 좋아요. 함께 들으면 좋겠어서 공유해요!",
-    trackCount: 15,
-    playCount: 1245,
-    likeCount: 89,
-    tracks: [
-      { id: 1, title: "Winter Song", artist: "The Dreamers" },
-      { id: 2, title: "Snowflake", artist: "Coldplay" },
-      { id: 3, title: "December", artist: "Taylor Swift" },
-      { id: 4, title: "Frozen", artist: "Madonna" },
-      { id: 5, title: "Ice", artist: "Sarah McLachlan" },
-    ],
-  };
+  // 편지 데이터 로드
+  useEffect(() => {
+    const loadLetter = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/letters/${params.id}`);
+        if (!response.ok) {
+          throw new Error("편지를 찾을 수 없습니다");
+        }
+        const data = await response.json();
+        setLetter(data.letter);
+      } catch (error) {
+        console.error("편지 로드 실패:", error);
+        setError(error instanceof Error ? error.message : "편지를 불러올 수 없습니다");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadLetter();
+  }, [params.id]);
+
+  // 편지 데이터 변환 (API 응답을 화면 표시용으로 변환)
+  const displayLetter = letter
+    ? {
+        id: letter.id,
+        sender:
+          typeof letter.sender === "object" && letter.sender !== null
+            ? letter.sender.nickname || letter.sender.email || ""
+            : letter.sender || "",
+        senderInitials:
+          typeof letter.sender === "object" && letter.sender !== null
+            ? letter.sender.nickname?.[0]?.toUpperCase() ||
+              letter.sender.email?.[0]?.toUpperCase() ||
+              ""
+            : letter.senderInitials || "",
+        date: letter.createdAt
+          ? (() => {
+              const date = new Date(letter.createdAt);
+              const now = new Date();
+              const diffMs = now.getTime() - date.getTime();
+              const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+              
+              if (diffDays === 0) return "오늘";
+              if (diffDays === 1) return "어제";
+              if (diffDays < 7) return `${diffDays}일 전`;
+              if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
+              if (diffDays < 365) return `${Math.floor(diffDays / 30)}개월 전`;
+              return `${Math.floor(diffDays / 365)}년 전`;
+            })()
+          : letter.date || "",
+        message: letter.message || "",
+        trackCount: letter.tracks?.length || 0,
+        playCount: letter.playCount || 0,
+        likeCount: letter.likeCount || 0,
+        tracks: letter.tracks || [],
+      }
+    : null;
 
   const handlePlayAll = () => {
+    if (!displayLetter) return;
+
     // 플랫폼 자동 추천 (P1)
     const recommendedPlatform = recommendSmartPlatform(
       {
-        tracks: letter.tracks.map((t) => ({
+        tracks: displayLetter.tracks.map((t: any) => ({
           id: String(t.id),
           title: t.title,
           artist: t.artist,
-          platform: "spotify" as Platform, // 실제로는 API에서 받아온 플랫폼 정보 사용
+          platform: (t.platform || "spotify") as Platform,
         })),
       },
       [], // 사용자 이력 (향후 구현)
@@ -69,9 +113,44 @@ export default function LetterDetailPage({
     platform: "spotify" | "apple" | "youtube" | "melon"
   ) => {
     // 실제 구현에서는 플랫폼별 재생 로직 호출
-    console.log(`재생: ${platform}`, letter.tracks);
-    // 예: window.open(`spotify:playlist:...`) 또는 API 호출
+    if (displayLetter) {
+      console.log(`재생: ${platform}`, displayLetter.tracks);
+      // 예: window.open(`spotify:playlist:...`) 또는 API 호출
+    }
   };
+
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
+        <Header showCreateButton showProfile />
+        <div className="max-w-4xl mx-auto px-8 py-12">
+          <div className="text-center text-white">로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error || !displayLetter) {
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
+        <Header showCreateButton showProfile />
+        <div className="max-w-4xl mx-auto px-8 py-12">
+          <div className="text-center text-white">
+            {error || "편지를 찾을 수 없습니다"}
+          </div>
+          <button
+            onClick={() => router.back()}
+            className="mt-4 px-4 py-2 rounded-lg text-white"
+            style={{ backgroundColor: "#1A1A1A" }}
+          >
+            뒤로 가기
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
@@ -97,16 +176,16 @@ export default function LetterDetailPage({
           {/* 보낸 사람 정보 */}
           <div className="flex items-center gap-4 mb-6">
             <ProfileAvatarGradient
-              initials={letter.senderInitials}
+              initials={displayLetter.senderInitials}
               size="lg"
               className="rounded-2xl"
             />
             <div className="flex-1">
               <h2 className="text-3xl font-bold text-white mb-1">
-                {letter.sender}
+                {displayLetter.sender}
               </h2>
               <p className="text-base" style={{ color: "#6A7282" }}>
-                {letter.date}
+                {displayLetter.date}
               </p>
             </div>
             <Icon name="heart" size={24} color="#6A7282" />
@@ -121,7 +200,7 @@ export default function LetterDetailPage({
             }}
           >
             <p className="text-base text-white leading-relaxed whitespace-pre-wrap">
-              {letter.message}
+              {displayLetter.message}
             </p>
           </div>
 
@@ -130,19 +209,19 @@ export default function LetterDetailPage({
             <div className="flex items-center gap-2">
               <Icon name="music" size={20} color="#6A7282" />
               <span className="text-base" style={{ color: "#6A7282" }}>
-                {letter.trackCount}곡
+                {displayLetter.trackCount}곡
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Icon name="play" size={20} color="#6A7282" />
               <span className="text-base" style={{ color: "#6A7282" }}>
-                {letter.playCount}회 재생
+                {displayLetter.playCount}회 재생
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Icon name="heart" size={20} color="#6A7282" />
               <span className="text-base" style={{ color: "#6A7282" }}>
-                {letter.likeCount}개
+                {displayLetter.likeCount}개
               </span>
             </div>
           </div>
@@ -169,7 +248,7 @@ export default function LetterDetailPage({
           </div>
 
           <div className="space-y-2">
-            {letter.tracks.map((track, index) => (
+            {displayLetter.tracks.map((track: any, index: number) => (
               <div
                 key={track.id}
                 className="flex items-center gap-4 p-4 rounded-lg transition-opacity hover:opacity-90 cursor-pointer"

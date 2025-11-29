@@ -79,13 +79,24 @@ export default function InboxPage() {
           }
         }
 
-        setLetters(loadedLetters);
+        // P1: 정렬 및 필터 적용
+        let processedLetters = loadedLetters;
+        
+        // 필터 적용
+        if (Object.keys(filterOptions).length > 0) {
+          processedLetters = filterLetters(processedLetters, filterOptions);
+        }
+        
+        // 정렬 적용
+        processedLetters = sortLetters(processedLetters, sortOption);
+        
+        setLetters(processedLetters);
       } else {
         // API 실패 시 데모 모드 편지 표시 (보낸 편지 탭에서만, 로그인하지 않은 경우만)
         if (activeTab === "sent" && !isAuthenticated) {
           const demoData = loadDemoLetter();
           if (demoData) {
-            setLetters([
+            let demoLetters = [
               {
                 id: "demo-letter",
                 recipient: "데모 편지",
@@ -95,8 +106,17 @@ export default function InboxPage() {
                 playCount: 0,
                 likeCount: 0,
                 date: "방금",
+                createdAt: new Date().toISOString(),
               },
-            ]);
+            ];
+            
+            // P1: 정렬 및 필터 적용
+            if (Object.keys(filterOptions).length > 0) {
+              demoLetters = filterLetters(demoLetters, filterOptions);
+            }
+            demoLetters = sortLetters(demoLetters, sortOption);
+            
+            setLetters(demoLetters);
           } else {
             setLetters([]);
           }
@@ -110,7 +130,7 @@ export default function InboxPage() {
       if (activeTab === "sent" && !isAuthenticated) {
         const demoData = loadDemoLetter();
         if (demoData) {
-          setLetters([
+          let demoLetters = [
             {
               id: "demo-letter",
               recipient: "데모 편지",
@@ -120,8 +140,17 @@ export default function InboxPage() {
               playCount: 0,
               likeCount: 0,
               date: "방금",
+              createdAt: new Date().toISOString(),
             },
-          ]);
+          ];
+          
+          // P1: 정렬 및 필터 적용
+          if (Object.keys(filterOptions).length > 0) {
+            demoLetters = filterLetters(demoLetters, filterOptions);
+          }
+          demoLetters = sortLetters(demoLetters, sortOption);
+          
+          setLetters(demoLetters);
         } else {
           setLetters([]);
         }
@@ -229,6 +258,141 @@ export default function InboxPage() {
           </select>
         </div>
 
+        {/* 필터 모달 (P1) */}
+        {isFilterModalOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}
+            onClick={() => setIsFilterModalOpen(false)}
+          >
+            <div
+              className="max-w-md w-full rounded-2xl p-8 flex flex-col gap-6"
+              style={{
+                backgroundColor: "#121212",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-bold text-white mb-2">필터</h2>
+              
+              {/* 보낸 사람/받은 사람 이름 필터 */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-400">
+                  {activeTab === "received" ? "보낸 사람" : "받은 사람"}
+                </label>
+                <input
+                  type="text"
+                  placeholder={
+                    activeTab === "received"
+                      ? "보낸 사람 이름 입력"
+                      : "받은 사람 이름 입력"
+                  }
+                  value={filterOptions.name || ""}
+                  onChange={(e) =>
+                    setFilterOptions({
+                      ...filterOptions,
+                      name: e.target.value || undefined,
+                    })
+                  }
+                  className="px-4 py-2 rounded-lg text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+                  style={{
+                    backgroundColor: "#1A1A1A",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                  }}
+                />
+              </div>
+
+              {/* 곡 제목 필터 */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-400">
+                  곡 제목
+                </label>
+                <input
+                  type="text"
+                  placeholder="곡 제목 입력"
+                  value={filterOptions.trackTitle || ""}
+                  onChange={(e) =>
+                    setFilterOptions({
+                      ...filterOptions,
+                      trackTitle: e.target.value || undefined,
+                    })
+                  }
+                  className="px-4 py-2 rounded-lg text-base text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+                  style={{
+                    backgroundColor: "#1A1A1A",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                  }}
+                />
+              </div>
+
+              {/* 날짜 범위 필터 */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-400">
+                  날짜 범위
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={filterOptions.dateFrom || ""}
+                    onChange={(e) =>
+                      setFilterOptions({
+                        ...filterOptions,
+                        dateFrom: e.target.value || undefined,
+                      })
+                    }
+                    className="flex-1 px-4 py-2 rounded-lg text-base text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+                    style={{
+                      backgroundColor: "#1A1A1A",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  />
+                  <span className="text-gray-400 self-center">~</span>
+                  <input
+                    type="date"
+                    value={filterOptions.dateTo || ""}
+                    onChange={(e) =>
+                      setFilterOptions({
+                        ...filterOptions,
+                        dateTo: e.target.value || undefined,
+                      })
+                    }
+                    className="flex-1 px-4 py-2 rounded-lg text-base text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+                    style={{
+                      backgroundColor: "#1A1A1A",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* 액션 버튼 */}
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => {
+                    setFilterOptions({});
+                    setIsFilterModalOpen(false);
+                  }}
+                  className="flex-1 px-6 py-3 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
+                  style={{
+                    backgroundColor: "#1A1A1A",
+                    color: "#FFFFFF",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                  }}
+                >
+                  초기화
+                </button>
+                <button
+                  onClick={() => setIsFilterModalOpen(false)}
+                  className="flex-1 px-6 py-3 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+                >
+                  적용
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 탭 */}
         <div
           className="inline-flex gap-2 p-1 rounded-lg mb-8"
@@ -262,7 +426,7 @@ export default function InboxPage() {
 
         {/* 편지 목록 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {letters.map((letter) => {
+          {letters.map((letter, index) => {
             // sender가 객체인 경우 nickname 또는 email 추출
             const senderName =
               typeof letter.sender === "object" && letter.sender !== null
@@ -291,9 +455,15 @@ export default function InboxPage() {
                   ""
                 : letter.recipientInitials || "";
 
+            // 편지 ID 확인
+            const letterId = letter.id;
+            if (!letterId) {
+              console.warn("편지 ID가 없습니다:", letter);
+            }
+
             return (
               <LetterCard
-                key={letter.id}
+                key={letterId || `letter-${index}`}
                 sender={activeTab === "received" ? senderName : undefined}
                 recipient={activeTab === "sent" ? recipientName : undefined}
                 senderInitials={senderInitials}
@@ -304,8 +474,11 @@ export default function InboxPage() {
                 likeCount={letter.likeCount || 0}
                 date={letter.date || letter.createdAt || ""}
                 onClick={() => {
-                  if (letter.id && letter.id !== "demo-letter") {
-                    router.push(`/letters/${letter.id}`);
+                  const id = letter.id;
+                  if (id && id !== "demo-letter") {
+                    router.push(`/letters/${id}`);
+                  } else {
+                    console.warn("편지 ID가 없거나 데모 편지입니다:", id, letter);
                   }
                 }}
               />
