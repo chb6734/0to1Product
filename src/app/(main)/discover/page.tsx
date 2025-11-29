@@ -1,11 +1,21 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/shared/components/layout/Header";
 import { LetterCard } from "@/domains/letter/components/LetterCard";
+import { useAuth } from "@/domains/auth/hooks/useAuth";
 
 export default function DiscoverPage() {
   const router = useRouter();
+  const { isAuthenticated, isInitializing } = useAuth();
+
+  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isInitializing && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isInitializing, router]);
 
   // 예시 데이터
   const letters = [
@@ -31,9 +41,14 @@ export default function DiscoverPage() {
     },
   ];
 
+  // 로딩 중이거나 인증되지 않은 경우 아무것도 렌더링하지 않음
+  if (isInitializing || !isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
-      <Header activeNav="discover" showCreateButton showProfile />
+      <Header activeNav="discover" showCreateButton />
       <div className="max-w-7xl mx-auto px-8 py-12">
         {/* 헤딩 */}
         <div className="mb-8">

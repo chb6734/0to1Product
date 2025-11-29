@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Header } from "@/shared/components/layout/Header";
+import { useAuth } from "@/domains/auth/hooks/useAuth";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
       <Header />
@@ -45,14 +50,16 @@ export default function Home() {
 
           {/* 버튼 */}
           <div className="flex flex-wrap gap-4">
-            <Link
-              href="/create?demo=true"
-              role="button"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#FFE11D", color: "#000000" }}
-            >
-              로그인 없이 체험하기
-            </Link>
+            {!isAuthenticated && (
+              <Link
+                href="/create?demo=true"
+                role="button"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+              >
+                로그인 없이 체험하기
+              </Link>
+            )}
             <Link
               href="/create"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-90"

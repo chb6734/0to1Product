@@ -1,18 +1,34 @@
 "use client";
 
 import Link from "next/link";
+import { useAuth } from "@/domains/auth/hooks/useAuth";
+import { ProfileAvatarGradient } from "@/shared/components/ui/ProfileAvatarGradient";
 
 interface HeaderProps {
   activeNav?: "inbox" | "discover" | null;
   showCreateButton?: boolean;
-  showProfile?: boolean;
+  showProfile?: boolean; // 명시적으로 프로필 표시 여부 지정 (옵션)
 }
 
 export function Header({
   activeNav = null,
   showCreateButton = false,
-  showProfile = false,
+  showProfile: explicitShowProfile,
 }: HeaderProps) {
+  const { user, isAuthenticated } = useAuth();
+  
+  // 명시적으로 지정되지 않으면 인증 상태에 따라 자동 결정
+  const showProfile = explicitShowProfile !== undefined 
+    ? explicitShowProfile 
+    : isAuthenticated && !!user;
+  
+  // 프로필 이니셜 추출
+  const profileInitials = user?.nickname 
+    ? user.nickname.substring(0, 2).toUpperCase()
+    : user?.email 
+    ? user.email.substring(0, 2).toUpperCase()
+    : "ME";
+
   return (
     <header
       className="sticky top-0 z-50"
@@ -80,17 +96,12 @@ export function Header({
                 편지 만들기
               </Link>
             )}
-            {showProfile && (
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
-                style={{
-                  background:
-                    "linear-gradient(180deg, #FFE11D 0%, #2ADFFF 100%)",
-                  color: "#000000",
-                }}
-              >
-                ME
-              </div>
+            {showProfile && user && (
+              <ProfileAvatarGradient
+                initials={profileInitials}
+                size="sm"
+                className="cursor-pointer"
+              />
             )}
             {!showCreateButton && !showProfile && (
               <Link

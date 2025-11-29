@@ -22,10 +22,17 @@ import { Icon } from "@/shared/components/ui/Icon";
 export default function InboxPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isInitializing } = useAuth();
   const { createLetter } = useLetter();
   const [letters, setLetters] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isInitializing && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isInitializing, router]);
 
   // 정렬/필터 상태 (P1)
   const [sortOption, setSortOption] = useState<SortOption>("date-desc");
