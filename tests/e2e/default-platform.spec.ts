@@ -7,7 +7,48 @@
  * 기반: PRD v4 - 기본 플랫폼 설정 기능
  */
 
-import { test, expect } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
+import { setupServer } from "msw/node";
+import { http, HttpResponse } from "msw";
+
+// MSW 서버 설정
+const server = setupServer(
+  // 프로필 업데이트 API Mock
+  http.put("/api/auth/profile", async ({ request }) => {
+    const body = (await request.json()) as {
+      nickname?: string;
+      profileImage?: string;
+      defaultPlatform?: string | null;
+    };
+    
+    // 요청 본문에 따라 사용자 데이터 생성
+    const user = {
+      id: "test-user-id",
+      email: "test@example.com",
+      nickname: body.nickname,
+      profileImage: body.profileImage,
+      defaultPlatform: body.defaultPlatform !== undefined ? body.defaultPlatform : undefined,
+      createdAt: new Date().toISOString(),
+    };
+    
+    return HttpResponse.json({ user });
+  })
+);
+
+// MSW 서버 시작/종료
+test.beforeAll(() => {
+  server.listen({ onUnhandledRequest: "bypass" });
+});
+
+test.afterEach(() => {
+  server.resetHandlers();
+});
+
+test.afterAll(() => {
+  server.close();
+});
+
+const test = base;
 
 test.describe("Default Platform Setting", () => {
   /**
@@ -58,29 +99,34 @@ test.describe("Default Platform Setting", () => {
     // And: "시작하기" 버튼 클릭
     const startButton = page.getByRole("button", { name: /시작하기/i });
     await expect(startButton).toBeEnabled();
-    
+
     // API 호출 완료 대기 (프로필 업데이트 + 기본 플랫폼 설정)
     // 두 개의 PUT 요청이 발생: updateProfile과 setDefaultPlatform
-    const responsePromise1 = page.waitForResponse((response) => 
-      response.url().includes('/api/auth/profile') && 
-      response.request().method() === 'PUT' &&
-      response.request().postDataJSON()?.nickname === '테스트 사용자'
+    const responsePromise1 = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/auth/profile") &&
+        response.request().method() === "PUT" &&
+        response.request().postDataJSON()?.nickname === "테스트 사용자"
     );
-    const responsePromise2 = page.waitForResponse((response) => 
-      response.url().includes('/api/auth/profile') && 
-      response.request().method() === 'PUT' &&
-      response.request().postDataJSON()?.defaultPlatform === 'spotify'
+    const responsePromise2 = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/auth/profile") &&
+        response.request().method() === "PUT" &&
+        response.request().postDataJSON()?.defaultPlatform === "spotify"
     );
-    
+
     await startButton.click();
-    
+
     // 두 API 호출이 모두 완료될 때까지 대기
-    const [response1, response2] = await Promise.all([responsePromise1, responsePromise2]);
+    const [response1, response2] = await Promise.all([
+      responsePromise1,
+      responsePromise2,
+    ]);
 
     // 응답 확인
     expect(response1.ok()).toBeTruthy();
     expect(response2.ok()).toBeTruthy();
-    
+
     // Then: 보관함으로 이동
     await expect(page).toHaveURL(/\/inbox/, { timeout: 10000 });
   });

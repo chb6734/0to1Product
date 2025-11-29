@@ -320,44 +320,40 @@ export function useAuth() {
       setError(null);
       setIsLoading(true);
       try {
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-          throw new Error("Supabase client not available");
-        }
+        // API 라우트를 통해 프로필 업데이트
+        const response = await fetch("/api/auth/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nickname: data.nickname,
+            profileImage: data.profileImage,
+          }),
+        });
 
-        // 중복 닉네임 체크
-        if (data.nickname) {
-          const { data: existingUser } = await supabase
-            .from("users")
-            .select("id")
-            .eq("nickname", data.nickname)
-            .neq("id", user.id)
-            .single();
-
-          if (existingUser) {
-            const error = new Error(AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          if (response.status === 409) {
+            const error = new Error(
+              errorData.error || AUTH_ERROR_MESSAGES.DUPLICATE_NICKNAME
+            );
             setError(error);
             throw error;
           }
+          throw new Error(
+            errorData.error || AUTH_ERROR_MESSAGES.PROFILE_UPDATE_FAILED
+          );
         }
 
-        const { data: updatedUser, error } = await supabase
-          .from("users")
-          .update({
-            nickname: data.nickname,
-            profile_image: data.profileImage,
-          })
-          .eq("id", user.id)
-          .select()
-          .single();
-
-        if (error) throw error;
+        const { user: updatedUser } = await response.json();
 
         const updatedUserData: User = {
           id: updatedUser.id,
           email: updatedUser.email,
           nickname: updatedUser.nickname,
-          profileImage: updatedUser.profile_image,
+          profileImage: updatedUser.profileImage || updatedUser.profile_image,
+          defaultPlatform: updatedUser.defaultPlatform,
         };
 
         setUser(updatedUserData);
@@ -373,7 +369,7 @@ export function useAuth() {
         setIsLoading(false);
       }
     },
-    [user, getSupabaseClient]
+    [user]
   );
 
   return {
