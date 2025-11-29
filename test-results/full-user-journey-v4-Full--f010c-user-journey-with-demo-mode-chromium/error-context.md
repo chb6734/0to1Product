@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "FAN:STAGE" [ref=e8] [cursor=pointer]:
+            - /url: /
+            - heading "FAN:STAGE" [level=1] [ref=e10]
+          - navigation [ref=e11]:
+            - link "보관함" [ref=e12] [cursor=pointer]:
+              - /url: /inbox
+            - link "둘러보기" [ref=e13] [cursor=pointer]:
+              - /url: /discover
+        - generic [ref=e14]:
+          - link "편지 만들기" [ref=e15] [cursor=pointer]:
+            - /url: /create
+            - img [ref=e16]
+            - text: 편지 만들기
+          - generic [ref=e18]: ME
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: 데모 모드
+        - paragraph [ref=e22]: 저장하려면 로그인이 필요합니다
+      - generic [ref=e23]:
+        - heading "음악 편지 만들기" [level=2] [ref=e24]
+        - paragraph [ref=e25]: 곡을 추가하고 메시지를 작성하세요
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - heading "곡 추가" [level=3] [ref=e29]
+            - generic [ref=e30]:
+              - textbox "곡, 아티스트, 앨범 검색..." [ref=e31]
+              - img [ref=e32]
+            - generic [ref=e35]:
+              - heading "추가된 곡" [level=4] [ref=e36]
+              - generic [ref=e37]:
+                - generic [ref=e38]:
+                  - generic [ref=e39]: "1"
+                  - generic [ref=e40]:
+                    - paragraph [ref=e41]: 겨울 노래
+                    - paragraph [ref=e42]: 겨울 아티스트
+                - button "삭제" [ref=e43] [cursor=pointer]
+          - generic [ref=e44]:
+            - heading "메시지" [level=3] [ref=e45]
+            - textbox "음악과 함께 전할 메시지를 작성하세요..." [ref=e46]: 요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요.
+            - generic [ref=e47]:
+              - paragraph [ref=e48]: 28/500
+              - button "템플릿 사용" [ref=e49] [cursor=pointer]
+          - generic [ref=e50]:
+            - heading "공개 설정" [level=3] [ref=e51]
+            - generic [ref=e52]:
+              - checkbox "링크만 공유 (비공개)" [checked] [ref=e53]
+              - generic [ref=e54] [cursor=pointer]:
+                - img [ref=e55]
+                - generic [ref=e57]: 링크만 공유 (비공개)
+            - paragraph [ref=e58]: 링크를 가진 사람만 이 편지를 볼 수 있습니다.
+          - button "완료 및 공유" [ref=e59] [cursor=pointer]
+        - generic [ref=e61]:
+          - heading "미리보기" [level=4] [ref=e62]
+          - generic [ref=e63]:
+            - paragraph [ref=e65]: 요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요.
+            - generic [ref=e66]:
+              - heading "플레이리스트" [level=5] [ref=e67]
+              - generic [ref=e68]:
+                - generic [ref=e69]: "1"
+                - generic [ref=e70]:
+                  - paragraph [ref=e71]: 겨울 노래
+                  - paragraph [ref=e72]: 겨울 아티스트
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - heading "편지가 완성되었습니다!" [level=2] [ref=e76]
+        - paragraph [ref=e77]: 임시 링크 (24시간 후 만료)
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - img [ref=e80]
+          - heading "공유 링크" [level=3] [ref=e82]
+        - generic [ref=e83]:
+          - textbox [ref=e84]: https://fanstage.com/l/abc123xyz
+          - button "복사" [active] [ref=e85] [cursor=pointer]:
+            - img [ref=e86]
+            - text: 복사
+      - generic [ref=e90]:
+        - img [ref=e91]
+        - heading "QR 코드" [level=3] [ref=e93]
+      - generic [ref=e161]:
+        - button "계속 만들기" [ref=e162] [cursor=pointer]
+        - button "영구 저장하려면 로그인하기" [ref=e163] [cursor=pointer]
+```

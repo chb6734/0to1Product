@@ -88,6 +88,24 @@ export const mockTracks: MockTrack[] = [
     platformTrackId: 'spotify:track:test-song',
     duration: 200000,
   },
+  {
+    id: 'track-8',
+    title: '크리스마스',
+    artist: '크리스마스 아티스트',
+    albumCover: 'https://i.scdn.co/image/ab67616d0000b273dummy',
+    platform: 'spotify',
+    platformTrackId: 'spotify:track:christmas-song',
+    duration: 220000,
+  },
+  {
+    id: 'track-9',
+    title: '눈',
+    artist: '눈 아티스트',
+    albumCover: 'https://i.scdn.co/image/ab67616d0000b273dummy',
+    platform: 'spotify',
+    platformTrackId: 'spotify:track:snow-song',
+    duration: 210000,
+  },
 ]
 
 // 샘플 편지 데이터 (동적으로 수정 가능하도록 let 사용)

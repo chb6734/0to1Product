@@ -28,8 +28,19 @@ export default function InboxPage() {
         const data = await response.json();
         let loadedLetters = data.letters || [];
         
-        // 보낸 편지 탭에서 데모 모드 편지도 함께 표시 (마이그레이션 전)
-        if (activeTab === "sent") {
+        // 중복 제거 (같은 메시지를 가진 편지 제거)
+        const seenMessages = new Set<string>();
+        loadedLetters = loadedLetters.filter((letter: any) => {
+          const message = letter.message || '';
+          if (seenMessages.has(message)) {
+            return false;
+          }
+          seenMessages.add(message);
+          return true;
+        });
+        
+        // 보낸 편지 탭에서 데모 모드 편지도 함께 표시 (마이그레이션 전, 로그인하지 않은 경우만)
+        if (activeTab === "sent" && !isAuthenticated) {
           const demoData = loadDemoLetter();
           if (demoData) {
             // API 응답에 데모 모드 편지가 없으면 추가
@@ -56,8 +67,8 @@ export default function InboxPage() {
         
         setLetters(loadedLetters);
       } else {
-        // API 실패 시 데모 모드 편지 표시 (보낸 편지 탭에서만)
-        if (activeTab === "sent") {
+        // API 실패 시 데모 모드 편지 표시 (보낸 편지 탭에서만, 로그인하지 않은 경우만)
+        if (activeTab === "sent" && !isAuthenticated) {
           const demoData = loadDemoLetter();
           if (demoData) {
             setLetters([
@@ -81,8 +92,8 @@ export default function InboxPage() {
       }
     } catch (error) {
       console.error("편지 목록 로드 실패:", error);
-      // 에러 시 데모 모드 편지 표시 (보낸 편지 탭에서만)
-      if (activeTab === "sent") {
+      // 에러 시 데모 모드 편지 표시 (보낸 편지 탭에서만, 로그인하지 않은 경우만)
+      if (activeTab === "sent" && !isAuthenticated) {
         const demoData = loadDemoLetter();
         if (demoData) {
           setLetters([
@@ -106,14 +117,18 @@ export default function InboxPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeTab]);
+  }, [activeTab, isAuthenticated]);
 
-  // 데모 모드 편지 마이그레이션
+  // 데모 모드 편지 마이그레이션 (한 번만 실행)
+  const [hasMigrated, setHasMigrated] = useState(false);
+  
   useEffect(() => {
     const migrateDemoLetter = async () => {
-      if (!isAuthenticated || !user) {
-        // 로그인하지 않은 경우 편지 목록만 로드
-        loadLetters();
+      // 이미 마이그레이션했거나 로그인하지 않은 경우 스킵
+      if (hasMigrated || !isAuthenticated || !user) {
+        if (!hasMigrated) {
+          loadLetters();
+        }
         return;
       }
 
@@ -145,17 +160,18 @@ export default function InboxPage() {
           return { id: result.id || result.letter?.id };
         });
         
+        setHasMigrated(true);
         // 마이그레이션 성공 후 편지 목록 다시 로드
         await loadLetters();
       } catch (error) {
         console.error("데모 모드 편지 마이그레이션 실패:", error);
-        // 마이그레이션 실패 시에도 편지 목록 로드 (데모 모드 편지 표시)
+        // 마이그레이션 실패 시에도 편지 목록 로드
         loadLetters();
       }
     };
 
     migrateDemoLetter();
-  }, [isAuthenticated, user, loadLetters]);
+  }, [isAuthenticated, user, loadLetters, hasMigrated]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
@@ -236,6 +252,11 @@ export default function InboxPage() {
                 playCount={letter.playCount || 0}
                 likeCount={letter.likeCount || 0}
                 date={letter.date || letter.createdAt || ''}
+                onClick={() => {
+                  if (letter.id && letter.id !== "demo-letter") {
+                    router.push(`/letters/${letter.id}`);
+                  }
+                }}
               />
             );
           })}

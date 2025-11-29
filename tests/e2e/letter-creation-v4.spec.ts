@@ -33,7 +33,7 @@ test.describe('Letter Creation Flow v4', () => {
     await expect(page.getByText(/음악 편지 만들기/i)).toBeVisible()
 
     // When: 곡 검색 및 추가 (3곡)
-    const searchInput = page.getByPlaceholderText(/곡.*검색/i)
+    const searchInput = page.getByPlaceholder(/곡.*검색/i)
     await searchInput.fill('겨울 노래')
     await page.waitForTimeout(500)
 
@@ -54,7 +54,7 @@ test.describe('Letter Creation Flow v4', () => {
     await addButtons.first().click()
 
     // And: 메시지 작성
-    const messageInput = page.getByPlaceholderText(/메시지/i)
+    const messageInput = page.getByPlaceholder(/메시지/i)
     await messageInput.fill('요즘 날씨가 추워지면서 자꾸 듣게 되는 곡들이에요. 추운 겨울밤, 창밖을 보며 들으면 정말 좋아요.')
 
     // And: "완료 및 공유" 버튼 클릭
@@ -86,14 +86,14 @@ test.describe('Letter Creation Flow v4', () => {
     await page.goto('/create')
 
     // 편지 생성 완료 (간소화)
-    const searchInput = page.getByPlaceholderText(/곡.*검색/i)
+    const searchInput = page.getByPlaceholder(/곡.*검색/i)
     await searchInput.fill('Song')
     await page.waitForTimeout(500)
     
     const addButton = page.getByRole('button', { name: /추가/i }).first()
     await addButton.click()
 
-    const messageInput = page.getByPlaceholderText(/메시지/i)
+    const messageInput = page.getByPlaceholder(/메시지/i)
     await messageInput.fill('링크 복사 테스트')
 
     const completeButton = page.getByRole('button', { name: /완료.*공유/i })

@@ -34,6 +34,8 @@ export default defineConfig({
     video: 'retain-on-failure',
     /* 트레이스 설정 */
     trace: 'on-first-retry',
+    /* 클립보드 권한 허용 */
+    permissions: ['clipboard-read', 'clipboard-write'],
   },
 
   /* 프로젝트 설정 */

@@ -1,0 +1,81 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "FAN:STAGE" [ref=e8] [cursor=pointer]:
+            - /url: /
+            - heading "FAN:STAGE" [level=1] [ref=e10]
+          - navigation [ref=e11]:
+            - link "보관함" [ref=e12] [cursor=pointer]:
+              - /url: /inbox
+            - link "둘러보기" [ref=e13] [cursor=pointer]:
+              - /url: /discover
+        - generic [ref=e14]:
+          - link "편지 만들기" [ref=e15] [cursor=pointer]:
+            - /url: /create
+            - img [ref=e16]
+            - text: 편지 만들기
+          - generic [ref=e18]: ME
+    - generic [ref=e19]:
+      - heading "내 보관함" [level=1] [ref=e21]
+      - generic [ref=e22]:
+        - button "받은 편지" [ref=e23] [cursor=pointer]
+        - button "보낸 편지" [ref=e24] [cursor=pointer]
+      - generic [ref=e25]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: 음
+          - generic [ref=e29]:
+            - generic [ref=e30]:
+              - heading "음악러버" [level=3] [ref=e31]
+              - generic [ref=e32]: 2024-01-10T10:00:00Z
+            - paragraph [ref=e33]: 생일 축하해! 이 곡들을 들으면서 행복한 하루 보내길 바라!
+            - generic [ref=e34]:
+              - generic [ref=e35]:
+                - img [ref=e36]
+                - generic [ref=e38]: 2곡
+              - generic [ref=e39]:
+                - img [ref=e40]
+                - generic [ref=e42]: 0회 재생
+              - generic [ref=e43]:
+                - img [ref=e44]
+                - generic [ref=e46]: 0개
+        - generic [ref=e48]:
+          - generic [ref=e49]: 플
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - heading "플레이리스트마스터" [level=3] [ref=e52]
+              - generic [ref=e53]: 2024-01-11T15:30:00Z
+            - paragraph [ref=e54]: 오늘 하루 힘들었을 것 같아서 위로의 플레이리스트를 만들어봤어.
+            - generic [ref=e55]:
+              - generic [ref=e56]:
+                - img [ref=e57]
+                - generic [ref=e59]: 1곡
+              - generic [ref=e60]:
+                - img [ref=e61]
+                - generic [ref=e63]: 0회 재생
+              - generic [ref=e64]:
+                - img [ref=e65]
+                - generic [ref=e67]: 0개
+        - generic [ref=e69]:
+          - generic [ref=e70]: 음
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - heading "음악러버" [level=3] [ref=e73]
+              - generic [ref=e74]: 2025-11-29T08:20:30.541Z
+            - paragraph [ref=e75]: 기존 사용자 테스트
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - img [ref=e78]
+                - generic [ref=e80]: 1곡
+              - generic [ref=e81]:
+                - img [ref=e82]
+                - generic [ref=e84]: 0회 재생
+              - generic [ref=e85]:
+                - img [ref=e86]
+                - generic [ref=e88]: 0개
+```

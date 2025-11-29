@@ -60,7 +60,8 @@ test.describe("Full User Journey v4", () => {
     // And: 링크 복사
     const copyButton = page.getByRole("button", { name: /복사/i });
     await copyButton.click();
-    await expect(page.getByText(/링크가 복사되었습니다/i)).toBeVisible();
+    // 복사 완료 메시지가 나타날 때까지 대기
+    await expect(page.getByText(/링크가 복사되었습니다/i)).toBeVisible({ timeout: 3000 });
 
     // And: "영구 저장하려면 로그인하기" 클릭
     const loginButton = page.getByRole("button", {
@@ -169,8 +170,11 @@ test.describe("Full User Journey v4", () => {
     const completeButton = page.getByRole("button", { name: /완료.*공유/i });
     await completeButton.click();
 
-    // 완료 버튼 클릭
-    const finishButton = page.getByRole("button", { name: /완료/i });
+    // 완료 버튼 클릭 (완성 모달의 완료 버튼)
+    // 완성 모달 내부의 완료 버튼만 선택 (모달이 열려있는 상태에서)
+    await expect(page.getByText(/편지가 완성되었습니다/i)).toBeVisible();
+    const modalContainer = page.locator('.fixed.inset-0').filter({ hasText: /편지가 완성되었습니다/i });
+    const finishButton = modalContainer.getByRole("button", { name: /^완료$/i });
     await finishButton.click();
 
     // Then: 보관함으로 이동
