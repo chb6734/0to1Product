@@ -265,10 +265,14 @@ export default function CreateLetterPage() {
     addTrack,
     removeTrack,
     setMessage,
+    setImage,
+    removeImage,
     createLetter,
     isCreating,
     loadDraft,
   } = useLetter();
+  
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<

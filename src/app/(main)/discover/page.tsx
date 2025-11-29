@@ -91,6 +91,7 @@ export default function DiscoverPage() {
       sender: senderName,
       senderInitials: senderInitials,
       message: letter.message || "",
+      imageUrl: letter.imageUrl,
       trackCount: letter.tracks?.length || 0,
       playCount: letter.playCount || 0,
       likeCount: letter.likeCount || 0,
@@ -125,6 +126,7 @@ export default function DiscoverPage() {
                   sender={letter.sender}
                   senderInitials={letter.senderInitials}
                   message={letter.message}
+                  imageUrl={letter.imageUrl}
                   trackCount={letter.trackCount}
                   playCount={letter.playCount}
                   likeCount={letter.likeCount}

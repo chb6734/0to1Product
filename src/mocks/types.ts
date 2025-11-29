@@ -28,6 +28,7 @@ export interface MockLetter {
   sender?: MockUser
   recipientEmail?: string
   message: string
+  imageUrl?: string
   tracks: MockTrack[]
   shareToken: string
   createdAt: string

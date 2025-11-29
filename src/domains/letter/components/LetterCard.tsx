@@ -2,6 +2,7 @@
 
 import { ProfileAvatar } from "@/shared/components/ui/ProfileAvatar";
 import { Icon } from "@/shared/components/ui/Icon";
+import { getDefaultLetterImage } from "@/shared/utils/imageUpload";
 
 interface LetterCardProps {
   sender?: string;
@@ -10,6 +11,7 @@ interface LetterCardProps {
   recipientInitials?: string;
   title?: string;
   message?: string;
+  imageUrl?: string;
   trackCount: number;
   playCount: number;
   likeCount: number;
@@ -24,6 +26,7 @@ export function LetterCard({
   recipientInitials,
   title,
   message,
+  imageUrl,
   trackCount,
   playCount,
   likeCount,
@@ -36,7 +39,7 @@ export function LetterCard({
   return (
     <div
       onClick={onClick}
-      className={`rounded-2xl p-6 transition-opacity hover:opacity-90 ${
+      className={`rounded-2xl overflow-hidden transition-opacity hover:opacity-90 ${
         onClick ? "cursor-pointer" : ""
       }`}
       style={{
@@ -44,7 +47,17 @@ export function LetterCard({
         border: "1px solid rgba(255, 255, 255, 0.05)",
       }}
     >
-      <div className="flex gap-4">
+      {/* 편지 이미지 */}
+      <div className="w-full h-48 overflow-hidden">
+        <img
+          src={imageUrl || getDefaultLetterImage()}
+          alt="편지 이미지"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      
+      <div className="p-6">
+        <div className="flex gap-4">
         <ProfileAvatar initials={displayInitials} size="md" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
@@ -82,6 +95,7 @@ export function LetterCard({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

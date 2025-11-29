@@ -25,6 +25,7 @@ interface Track {
 interface Letter {
   tracks: Track[];
   message: string;
+  imageUrl?: string;
 }
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -35,6 +36,7 @@ export function useLetter() {
   const [letter, setLetter] = useState<Letter>({
     tracks: [],
     message: "",
+    imageUrl: undefined,
   });
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -271,6 +273,8 @@ export function useLetter() {
     reorderTracks,
     setMessage,
     addTrackMemo,
+    setImage,
+    removeImage,
     createLetter,
     resetLetter,
     loadDraft,

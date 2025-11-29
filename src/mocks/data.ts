@@ -190,6 +190,7 @@ export function createMockLetter(overrides?: Partial<MockLetter>): MockLetter {
     shareToken: `share-token-${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    imageUrl: undefined,
     ...overrides,
   }
 }

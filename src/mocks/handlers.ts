@@ -168,7 +168,7 @@ const letterHandlers = [
 
   http.post('/api/letters', async ({ request }) => {
     await delay(800)
-    const body = await request.json() as { tracks: MockTrack[]; message: string; recipientEmail?: string }
+    const body = await request.json() as { tracks: MockTrack[]; message: string; recipientEmail?: string; imageUrl?: string }
     if (!body.tracks || body.tracks.length === 0) {
       return HttpResponse.json({ error: '최소 1곡 이상 추가해주세요' }, { status: 400 })
     }
@@ -180,6 +180,7 @@ const letterHandlers = [
       sender: mockUsers[0],
       recipientEmail: body.recipientEmail,
       message: body.message,
+      imageUrl: body.imageUrl,
       tracks: body.tracks,
     })
     mockLetters.push(newLetter)

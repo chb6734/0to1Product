@@ -11,6 +11,7 @@ import {
   recommendSmartPlatform,
   type Platform,
 } from "@/shared/utils/platformRecommendation";
+import { getDefaultLetterImage } from "@/shared/utils/imageUpload";
 
 export default function LetterDetailPage({
   params,
@@ -173,6 +174,26 @@ export default function LetterDetailPage({
             border: "1px solid rgba(255, 255, 255, 0.05)",
           }}
         >
+          {/* 편지 이미지 */}
+          {displayLetter.imageUrl && (
+            <div className="mb-6 rounded-lg overflow-hidden">
+              <img
+                src={displayLetter.imageUrl}
+                alt="편지 이미지"
+                className="w-full h-64 object-cover"
+              />
+            </div>
+          )}
+          {!displayLetter.imageUrl && (
+            <div className="mb-6 rounded-lg overflow-hidden">
+              <img
+                src={getDefaultLetterImage()}
+                alt="기본 편지 이미지"
+                className="w-full h-64 object-cover"
+              />
+            </div>
+          )}
+
           {/* 보낸 사람 정보 */}
           <div className="flex items-center gap-4 mb-6">
             <ProfileAvatarGradient
