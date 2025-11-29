@@ -1,9 +1,25 @@
 "use client";
 
+import { useAuth } from "@/domains/auth/hooks/useAuth";
+import { useRouter } from "next/navigation";
+
 export default function LoginPage() {
-  const handleLogin = (provider: string) => {
-    console.log(`[LoginPage] ${provider} 로그인 버튼 클릭 (퍼블리싱 테스트용)`);
-    // 퍼블리싱 테스트를 위해 실제 로그인 로직 제거
+  const router = useRouter();
+  const { loginWithGoogle, loginWithKakao, loginWithApple, isLoading } = useAuth();
+
+  const handleLogin = async (provider: "google" | "kakao" | "apple") => {
+    try {
+      if (provider === "google") {
+        await loginWithGoogle();
+      } else if (provider === "kakao") {
+        await loginWithKakao();
+      } else if (provider === "apple") {
+        await loginWithApple();
+      }
+      // 로그인 성공 시 리다이렉트는 useAuth에서 처리됨
+    } catch (error) {
+      console.error(`[LoginPage] ${provider} 로그인 실패:`, error);
+    }
   };
 
   return (
@@ -55,8 +71,9 @@ export default function LoginPage() {
         <div className="w-full flex flex-col gap-3">
           {/* Google 로그인 */}
           <button
-            onClick={() => handleLogin("Google")}
-            className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 font-medium text-base transition-opacity hover:opacity-90"
+            onClick={() => handleLogin("google")}
+            disabled={isLoading}
+            className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 font-medium text-base transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: "#FFFFFF",
               border: "1px solid #E5E7EB",
@@ -86,8 +103,9 @@ export default function LoginPage() {
 
           {/* 카카오 로그인 */}
           <button
-            onClick={() => handleLogin("Kakao")}
-            className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 font-medium text-base transition-opacity hover:opacity-90"
+            onClick={() => handleLogin("kakao")}
+            disabled={isLoading}
+            className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 font-medium text-base transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: "#FEE500",
               color: "#000000",
@@ -104,8 +122,9 @@ export default function LoginPage() {
 
           {/* Apple 로그인 */}
           <button
-            onClick={() => handleLogin("Apple")}
-            className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 font-medium text-base transition-opacity hover:opacity-90"
+            onClick={() => handleLogin("apple")}
+            disabled={isLoading}
+            className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 font-medium text-base transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: "#121212",
               border: "1px solid rgba(255, 255, 255, 0.1)",

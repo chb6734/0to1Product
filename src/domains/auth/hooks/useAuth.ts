@@ -178,22 +178,39 @@ export function useAuth() {
     setError(null);
     setIsLoading(true);
     try {
-      const supabase = getSupabaseClient();
-      if (!supabase) {
-        throw new Error("Supabase client not available");
-      }
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+      // E2E 테스트 환경에서는 API 라우트를 통해 호출
+      const response = await fetch("/api/auth/login/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED);
+      }
 
-      // OAuth 리다이렉트가 발생하므로 여기서는 성공만 확인
-      console.log("[useAuth] Google OAuth 리다이렉트 시작");
+      const data = await response.json();
+      
+      // 사용자 정보 저장
+      if (data.user) {
+        const userData: User = {
+          id: data.user.id,
+          email: data.user.email || "",
+          nickname: data.user.nickname,
+          profileImage: data.user.profileImage,
+          defaultPlatform: data.user.defaultPlatform,
+        };
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        // 온보딩 필요 여부 확인 후 리다이렉트
+        if (!userData.nickname) {
+          window.location.href = "/onboarding";
+        } else {
+          window.location.href = "/inbox";
+        }
+      }
     } catch (error) {
       const authError =
         error instanceof Error
@@ -203,7 +220,7 @@ export function useAuth() {
       setIsLoading(false);
       throw authError;
     }
-  }, [getSupabaseClient]);
+  }, []);
 
   /**
    * Kakao 소셜 로그인
@@ -212,22 +229,36 @@ export function useAuth() {
     setError(null);
     setIsLoading(true);
     try {
-      const supabase = getSupabaseClient();
-      if (!supabase) {
-        throw new Error("Supabase client not available");
-      }
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "kakao",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+      const response = await fetch("/api/auth/login/kakao", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED);
+      }
 
-      // OAuth 리다이렉트가 발생하므로 여기서는 성공만 확인
-      console.log("[useAuth] Kakao OAuth 리다이렉트 시작");
+      const data = await response.json();
+      
+      if (data.user) {
+        const userData: User = {
+          id: data.user.id,
+          email: data.user.email || "",
+          nickname: data.user.nickname,
+          profileImage: data.user.profileImage,
+          defaultPlatform: data.user.defaultPlatform,
+        };
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        if (!userData.nickname) {
+          window.location.href = "/onboarding";
+        } else {
+          window.location.href = "/inbox";
+        }
+      }
     } catch (error) {
       const authError =
         error instanceof Error
@@ -237,7 +268,7 @@ export function useAuth() {
       setIsLoading(false);
       throw authError;
     }
-  }, [getSupabaseClient]);
+  }, []);
 
   /**
    * Apple 소셜 로그인
@@ -246,22 +277,36 @@ export function useAuth() {
     setError(null);
     setIsLoading(true);
     try {
-      const supabase = getSupabaseClient();
-      if (!supabase) {
-        throw new Error("Supabase client not available");
-      }
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+      const response = await fetch("/api/auth/login/apple", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(AUTH_ERROR_MESSAGES.CONNECTION_FAILED);
+      }
 
-      // OAuth 리다이렉트가 발생하므로 여기서는 성공만 확인
-      console.log("[useAuth] Apple OAuth 리다이렉트 시작");
+      const data = await response.json();
+      
+      if (data.user) {
+        const userData: User = {
+          id: data.user.id,
+          email: data.user.email || "",
+          nickname: data.user.nickname,
+          profileImage: data.user.profileImage,
+          defaultPlatform: data.user.defaultPlatform,
+        };
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        if (!userData.nickname) {
+          window.location.href = "/onboarding";
+        } else {
+          window.location.href = "/inbox";
+        }
+      }
     } catch (error) {
       const authError =
         error instanceof Error
@@ -271,7 +316,7 @@ export function useAuth() {
       setIsLoading(false);
       throw authError;
     }
-  }, [getSupabaseClient]);
+  }, []);
 
   /**
    * 로그아웃

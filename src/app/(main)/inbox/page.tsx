@@ -63,7 +63,35 @@ export default function InboxPage() {
         const response = await fetch(`/api/letters?type=${type}`);
         if (response.ok) {
           const data = await response.json();
-          setLetters(data.letters || []);
+          let loadedLetters = data.letters || [];
+          
+          // 보낸 편지 탭에서 데모 모드 편지도 함께 표시 (마이그레이션 전)
+          if (activeTab === "sent") {
+            const demoData = loadDemoLetter();
+            if (demoData) {
+              // API 응답에 데모 모드 편지가 없으면 추가
+              const hasDemoLetter = loadedLetters.some(
+                (letter: any) => letter.message === demoData.message
+              );
+              if (!hasDemoLetter) {
+                loadedLetters = [
+                  {
+                    id: "demo-letter",
+                    recipient: "데모 편지",
+                    recipientInitials: "DM",
+                    message: demoData.message,
+                    trackCount: demoData.tracks.length,
+                    playCount: 0,
+                    likeCount: 0,
+                    date: "방금",
+                  },
+                  ...loadedLetters,
+                ];
+              }
+            }
+          }
+          
+          setLetters(loadedLetters);
         } else {
           // API 실패 시 데모 모드 편지 표시 (보낸 편지 탭에서만)
           if (activeTab === "sent") {
@@ -118,7 +146,7 @@ export default function InboxPage() {
     };
 
     loadLetters();
-  }, [activeTab]);
+  }, [activeTab, isAuthenticated]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
