@@ -94,6 +94,8 @@ export function useAuth() {
       try {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
         console.log("[useAuth] localStorage에 사용자 정보 저장:", user);
+        // 다른 컴포넌트에 변경사항 알림
+        window.dispatchEvent(new Event('localStorageChange'));
       } catch (error) {
         console.error("[useAuth] localStorage 저장 실패:", error);
       }
@@ -101,6 +103,8 @@ export function useAuth() {
       try {
         localStorage.removeItem(AUTH_STORAGE_KEY);
         console.log("[useAuth] localStorage에서 사용자 정보 제거");
+        // 다른 컴포넌트에 변경사항 알림
+        window.dispatchEvent(new Event('localStorageChange'));
       } catch (error) {
         console.error("[useAuth] localStorage 제거 실패:", error);
       }
@@ -276,8 +280,22 @@ export function useAuth() {
           profileImage: data.user.profileImage,
           defaultPlatform: data.user.defaultPlatform,
         };
+        
+        // 상태 업데이트 (useEffect에서 localStorage에 자동 저장됨)
         setUser(userData);
         setIsAuthenticated(true);
+        
+        // 명시적으로 localStorage 저장 (프로필 정보가 로그아웃까지 유지되도록)
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+            console.log("[useAuth] 로그인 성공: localStorage에 사용자 정보 저장:", userData);
+            // 다른 컴포넌트에 변경사항 알림
+            window.dispatchEvent(new Event('localStorageChange'));
+          } catch (error) {
+            console.error("[useAuth] 로그인 후 localStorage 저장 실패:", error);
+          }
+        }
         
         if (!userData.nickname) {
           window.location.href = "/onboarding";
@@ -324,8 +342,22 @@ export function useAuth() {
           profileImage: data.user.profileImage,
           defaultPlatform: data.user.defaultPlatform,
         };
+        
+        // 상태 업데이트 (useEffect에서 localStorage에 자동 저장됨)
         setUser(userData);
         setIsAuthenticated(true);
+        
+        // 명시적으로 localStorage 저장 (프로필 정보가 로그아웃까지 유지되도록)
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+            console.log("[useAuth] 로그인 성공: localStorage에 사용자 정보 저장:", userData);
+            // 다른 컴포넌트에 변경사항 알림
+            window.dispatchEvent(new Event('localStorageChange'));
+          } catch (error) {
+            console.error("[useAuth] 로그인 후 localStorage 저장 실패:", error);
+          }
+        }
         
         if (!userData.nickname) {
           window.location.href = "/onboarding";
@@ -352,19 +384,26 @@ export function useAuth() {
     setIsLoading(true);
     try {
       const supabase = getSupabaseClient();
-      if (!supabase) {
-        // Supabase가 없으면 로컬 상태만 초기화
-        setUser(null);
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
+      if (supabase) {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
       }
 
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
+      // 로컬 상태 초기화
       setUser(null);
       setIsAuthenticated(false);
+      
+      // localStorage에서 모든 사용자 관련 정보 삭제 (프로필 정보가 로그아웃까지 유지되다가 삭제됨)
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          console.log("[useAuth] 로그아웃: localStorage에서 사용자 정보 삭제");
+          // 다른 컴포넌트에 변경사항 알림
+          window.dispatchEvent(new Event('localStorageChange'));
+        } catch (error) {
+          console.error("[useAuth] 로그아웃: localStorage 삭제 실패:", error);
+        }
+      }
     } catch (error) {
       const authError =
         error instanceof Error
@@ -427,7 +466,21 @@ export function useAuth() {
           defaultPlatform: updatedUser.defaultPlatform,
         };
 
+        // 상태 업데이트 (useEffect에서 localStorage에 자동 저장됨)
         setUser(updatedUserData);
+        
+        // 명시적으로 localStorage 업데이트 (프로필 정보가 로그아웃까지 유지되도록)
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUserData));
+            console.log("[useAuth] 프로필 업데이트 후 localStorage 저장:", updatedUserData);
+            // 다른 컴포넌트에 변경사항 알림
+            window.dispatchEvent(new Event('localStorageChange'));
+          } catch (error) {
+            console.error("[useAuth] 프로필 업데이트 후 localStorage 저장 실패:", error);
+          }
+        }
+        
         return updatedUserData;
       } catch (error) {
         const authError =
