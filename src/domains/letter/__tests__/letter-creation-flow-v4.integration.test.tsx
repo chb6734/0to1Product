@@ -19,12 +19,39 @@ import { mockTracks } from '@/mocks/data'
 import CreateLetterPage from '@/app/(main)/create/page'
 import { enableDemoMode, saveDemoLetter } from '@/shared/utils/demoMode'
 
+// Next.js 라우터 모킹
+const mockPush = vi.fn()
+const mockSearchParams = new URLSearchParams()
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    back: vi.fn(),
+    pathname: '/create',
+    query: {},
+    asPath: '/create',
+  }),
+  useSearchParams: () => mockSearchParams,
+}))
+
+// useAuth 모킹
+vi.mock('@/domains/auth/hooks/useAuth', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    isAuthenticated: false,
+    updateProfile: vi.fn(),
+  })),
+}))
+
 describe('Letter Creation Flow v4', () => {
   beforeEach(() => {
     // 데모 모드 초기화
     if (typeof window !== 'undefined') {
       localStorage.clear()
     }
+    // 모킹 초기화
+    mockPush.mockClear()
+    mockSearchParams.delete('demo')
   })
 
   /**
@@ -81,6 +108,7 @@ describe('Letter Creation Flow v4', () => {
    */
   it('should create letter in demo mode', async () => {
     enableDemoMode()
+    mockSearchParams.set('demo', 'true')
 
     const user = userEvent.setup()
 
