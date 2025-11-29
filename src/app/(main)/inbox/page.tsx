@@ -79,7 +79,8 @@ export default function InboxPage() {
                   trackCount: demoData.tracks.length,
                   playCount: 0,
                   likeCount: 0,
-                  date: "방금",
+                  date: formatDateToKorean(new Date().toISOString()),
+                  createdAt: new Date().toISOString(),
                 },
                 ...loadedLetters,
               ];
