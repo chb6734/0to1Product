@@ -196,6 +196,7 @@ export function useLetter() {
           albumCover: "", // 임시 저장에는 앨범 커버가 없을 수 있음
         })),
         message: draft.message,
+        imageUrl: draft.imageUrl,
       });
       return true;
     }

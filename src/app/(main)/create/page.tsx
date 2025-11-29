@@ -353,6 +353,7 @@ export default function CreateLetterPage() {
           artist: t.artist,
         })),
         message: letter.message,
+        imageUrl: letter.imageUrl,
         isPrivate: true,
       });
       setIsCompletionModalOpen(true);
