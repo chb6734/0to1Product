@@ -7,6 +7,7 @@ import { ProfileAvatarGradient } from "@/shared/components/ui/ProfileAvatarGradi
 import { Icon } from "@/shared/components/ui/Icon";
 import { PlatformSelectModal } from "@/shared/components/ui/PlatformSelectModal";
 import { useDefaultPlatform } from "@/domains/auth/hooks/useDefaultPlatform";
+import { recommendSmartPlatform, type Platform } from "@/shared/utils/platformRecommendation";
 
 export default function LetterDetailPage({
   params,
@@ -38,11 +39,25 @@ export default function LetterDetailPage({
   };
 
   const handlePlayAll = () => {
-    if (defaultPlatform) {
-      // 기본 플랫폼이 설정되어 있으면 바로 재생
-      playOnPlatform(defaultPlatform);
+    // 플랫폼 자동 추천 (P1)
+    const recommendedPlatform = recommendSmartPlatform(
+      {
+        tracks: letter.tracks.map((t) => ({
+          id: String(t.id),
+          title: t.title,
+          artist: t.artist,
+          platform: 'spotify' as Platform, // 실제로는 API에서 받아온 플랫폼 정보 사용
+        })),
+      },
+      [], // 사용자 이력 (향후 구현)
+      defaultPlatform
+    );
+
+    if (recommendedPlatform && recommendedPlatform === defaultPlatform) {
+      // 추천 플랫폼이 기본 플랫폼과 같으면 바로 재생
+      playOnPlatform(recommendedPlatform);
     } else {
-      // 기본 플랫폼이 없으면 모달 표시
+      // 추천 플랫폼이 다르거나 기본 플랫폼이 없으면 모달 표시
       setIsPlatformModalOpen(true);
     }
   };

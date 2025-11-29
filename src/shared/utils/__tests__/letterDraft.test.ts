@@ -37,7 +37,7 @@ describe('편지 임시 저장', () => {
 
     letterDraftUtils.saveDraft(draft)
 
-    const stored = localStorage.getItem(DRAFT_STORAGE_KEY)
+    const stored = localStorage.getItem('fanstage_letter_draft')
     expect(stored).not.toBeNull()
     
     const parsed = JSON.parse(stored!)
@@ -111,7 +111,7 @@ describe('편지 임시 저장', () => {
    * Then: null 반환 (에러 발생하지 않음)
    */
   it('잘못된 JSON 데이터 처리', () => {
-    localStorage.setItem(DRAFT_STORAGE_KEY, 'invalid json')
+    localStorage.setItem('fanstage_letter_draft', 'invalid json')
     
     const loaded = letterDraftUtils.loadDraft()
     

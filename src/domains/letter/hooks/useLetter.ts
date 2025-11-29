@@ -8,9 +8,11 @@
  * - 메시지 작성
  * - 곡에 메모 추가
  * - 편지 생성
+ * - 임시 저장 (P1)
  */
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { LETTER_ERROR_MESSAGES } from '@/shared/constants/errorMessages'
+import { letterDraftUtils } from '@/shared/utils/letterDraft'
 
 interface Track {
   id: string
@@ -36,35 +38,74 @@ export function useLetter() {
   })
   const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  
+  // 임시 저장 debounce를 위한 ref
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  /**
+   * 임시 저장 (debounce 1초)
+   */
+  const saveDraft = useCallback((letterData: Letter) => {
+    // 이전 타이머 취소
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+    
+    // 1초 후 저장
+    saveTimeoutRef.current = setTimeout(() => {
+      letterDraftUtils.saveDraft({
+        tracks: letterData.tracks.map((t) => ({
+          id: t.id,
+          title: t.title,
+          artist: t.artist,
+        })),
+        message: letterData.message,
+      })
+    }, 1000)
+  }, [])
 
   /**
    * 곡 추가
    */
-  const addTrack = useCallback((track: Track) => {
-    setLetter((prev) => ({
-      ...prev,
-      tracks: [...prev.tracks, track],
-    }))
-  }, [])
+  const addTrack = useCallback(
+    (track: Track) => {
+      setLetter((prev) => {
+        const newLetter = {
+          ...prev,
+          tracks: [...prev.tracks, track],
+        }
+        // 임시 저장
+        saveDraft(newLetter)
+        return newLetter
+      })
+    },
+    [saveDraft]
+  )
 
   /**
    * 곡 삭제
    */
-  const removeTrack = useCallback((trackId: string) => {
-    setLetter((prev) => {
-      const newTracks = prev.tracks.filter((track) => track.id !== trackId)
-      
-      // 최소 1곡은 유지해야 함
-      if (newTracks.length === 0) {
-        return prev
-      }
+  const removeTrack = useCallback(
+    (trackId: string) => {
+      setLetter((prev) => {
+        const newTracks = prev.tracks.filter((track) => track.id !== trackId)
 
-      return {
-        ...prev,
-        tracks: newTracks,
-      }
-    })
-  }, [])
+        // 최소 1곡은 유지해야 함
+        if (newTracks.length === 0) {
+          return prev
+        }
+
+        const newLetter = {
+          ...prev,
+          tracks: newTracks,
+        }
+        // 임시 저장
+        saveDraft(newLetter)
+        return newLetter
+      })
+    },
+    [saveDraft]
+  )
 
   /**
    * 곡 순서 변경
@@ -85,19 +126,27 @@ export function useLetter() {
   /**
    * 메시지 설정
    */
-  const setMessage = useCallback((message: string) => {
-    if (message.length > MAX_MESSAGE_LENGTH) {
-      const error = new Error(LETTER_ERROR_MESSAGES.MESSAGE_TOO_LONG)
-      setError(error)
-      throw error
-    }
+  const setMessage = useCallback(
+    (message: string) => {
+      if (message.length > MAX_MESSAGE_LENGTH) {
+        const error = new Error(LETTER_ERROR_MESSAGES.MESSAGE_TOO_LONG)
+        setError(error)
+        throw error
+      }
 
-    setError(null)
-    setLetter((prev) => ({
-      ...prev,
-      message,
-    }))
-  }, [])
+      setError(null)
+      setLetter((prev) => {
+        const newLetter = {
+          ...prev,
+          message,
+        }
+        // 임시 저장
+        saveDraft(newLetter)
+        return newLetter
+      })
+    },
+    [saveDraft]
+  )
 
   /**
    * 곡에 메모 추가
@@ -127,6 +176,28 @@ export function useLetter() {
       message: '',
     })
     setError(null)
+    // 임시 저장 데이터도 삭제
+    letterDraftUtils.clearDraft()
+  }, [])
+
+  /**
+   * 임시 저장된 편지 복구
+   */
+  const loadDraft = useCallback(() => {
+    const draft = letterDraftUtils.loadDraft()
+    if (draft) {
+      setLetter({
+        tracks: draft.tracks.map((t) => ({
+          id: t.id,
+          title: t.title,
+          artist: t.artist,
+          albumCover: '', // 임시 저장에는 앨범 커버가 없을 수 있음
+        })),
+        message: draft.message,
+      })
+      return true
+    }
+    return false
   }, [])
 
   /**
@@ -164,6 +235,10 @@ export function useLetter() {
       }
 
       const data = await response.json()
+      
+      // 편지 생성 성공 시 임시 저장 데이터 삭제
+      letterDraftUtils.clearDraft()
+      
       return data.id
     } catch (error) {
       const letterError = error instanceof Error 
@@ -177,6 +252,15 @@ export function useLetter() {
     }
   }, [letter, isCreating])
 
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [])
+
   return {
     letter,
     isCreating,
@@ -188,6 +272,7 @@ export function useLetter() {
     addTrackMemo,
     createLetter,
     resetLetter,
+    loadDraft,
   }
 }
 

@@ -12,6 +12,65 @@ import {
   migrateDemoLetterToServer,
 } from "@/shared/utils/demoMode";
 import { useAuth } from "@/domains/auth/hooks/useAuth";
+import { letterDraftUtils } from "@/shared/utils/letterDraft";
+import { generateAutocompleteSuggestions } from "@/shared/utils/autocomplete";
+
+/**
+ * 복구 모달 컴포넌트
+ */
+function RestoreDraftModal({
+  isOpen,
+  onRestore,
+  onNew,
+}: {
+  isOpen: boolean;
+  onRestore: () => void;
+  onNew: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}
+    >
+      <div
+        className="max-w-md w-full rounded-2xl p-8 flex flex-col gap-6"
+        style={{
+          backgroundColor: "#121212",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+        }}
+      >
+        <h2 className="text-2xl font-bold text-white mb-2">
+          이전에 작성하던 편지가 있습니다
+        </h2>
+        <p className="text-base text-gray-400 mb-4">
+          복구하시겠습니까?
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onRestore}
+            className="flex-1 px-6 py-3 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#FFE11D", color: "#000000" }}
+          >
+            복구
+          </button>
+          <button
+            onClick={onNew}
+            className="flex-1 px-6 py-3 rounded-lg font-medium text-base transition-opacity hover:opacity-90"
+            style={{
+              backgroundColor: "#1A1A1A",
+              color: "#FFFFFF",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            새로 작성
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /**
  * 완성 모달 컴포넌트
@@ -208,7 +267,11 @@ export default function CreateLetterPage() {
     setMessage,
     createLetter,
     isCreating,
+    loadDraft,
   } = useLetter();
+  
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<string[]>([]);
 
   // 데모 모드 확인
   const demoMode = searchParams.get("demo") === "true" || isDemoMode();
@@ -218,6 +281,29 @@ export default function CreateLetterPage() {
       enableDemoMode();
     }
   }, [demoMode]);
+
+  // 페이지 진입 시 임시 저장 데이터 확인 (데모 모드가 아닐 때만)
+  useEffect(() => {
+    if (!demoMode && letterDraftUtils.hasDraft()) {
+      setIsRestoreModalOpen(true);
+    }
+  }, [demoMode]);
+
+  // 자동완성 제안 생성
+  useEffect(() => {
+    if (searchQuery.length >= 2 && searchResults.length > 0) {
+      const suggestions = generateAutocompleteSuggestions(
+        searchQuery,
+        searchResults.map((track) => ({
+          title: track.title,
+          artist: track.artist,
+        }))
+      );
+      setAutocompleteSuggestions(suggestions);
+    } else {
+      setAutocompleteSuggestions([]);
+    }
+  }, [searchQuery, searchResults]);
 
   // 곡 검색 (debounce)
   useEffect(() => {
@@ -296,6 +382,23 @@ export default function CreateLetterPage() {
     }
   };
 
+  // 복구 모달 핸들러
+  const handleRestoreDraft = () => {
+    loadDraft();
+    setIsRestoreModalOpen(false);
+  };
+
+  const handleNewDraft = () => {
+    letterDraftUtils.clearDraft();
+    setIsRestoreModalOpen(false);
+  };
+
+  // 자동완성 제안 클릭 핸들러
+  const handleAutocompleteClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    setAutocompleteSuggestions([]);
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0A0A" }}>
       <Header showCreateButton showProfile />
@@ -355,6 +458,27 @@ export default function CreateLetterPage() {
                   color="#6A7282"
                   className="absolute left-4 top-1/2 -translate-y-1/2"
                 />
+                {/* 자동완성 제안 (P1) - 검색 결과가 없을 때만 표시 */}
+                {autocompleteSuggestions.length > 0 && searchResults.length === 0 && (
+                  <div
+                    className="absolute z-10 w-full mt-1 rounded-lg overflow-hidden shadow-lg"
+                    style={{
+                      backgroundColor: "#1A1A1A",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                    data-testid="autocomplete-suggestions"
+                  >
+                    {autocompleteSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAutocompleteClick(suggestion)}
+                        className="w-full px-4 py-2 text-left text-base text-white hover:bg-gray-800 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* 검색 결과 */}
@@ -595,6 +719,13 @@ export default function CreateLetterPage() {
           </div>
         </div>
       </div>
+
+      {/* 복구 모달 (P1) */}
+      <RestoreDraftModal
+        isOpen={isRestoreModalOpen}
+        onRestore={handleRestoreDraft}
+        onNew={handleNewDraft}
+      />
 
       {/* 완성 모달 */}
       <CompletionModal

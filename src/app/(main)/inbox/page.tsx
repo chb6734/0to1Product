@@ -11,6 +11,8 @@ import {
   migrateDemoLetterToServer,
 } from "@/shared/utils/demoMode";
 import { useLetter } from "@/domains/letter/hooks/useLetter";
+import { sortLetters, filterLetters, type SortOption, type FilterOptions } from "@/shared/utils/sortFilter";
+import { Icon } from "@/shared/components/ui/Icon";
 
 export default function InboxPage() {
   const router = useRouter();
@@ -19,6 +21,11 @@ export default function InboxPage() {
   const { createLetter } = useLetter();
   const [letters, setLetters] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // 정렬/필터 상태 (P1)
+  const [sortOption, setSortOption] = useState<SortOption>("date-desc");
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({});
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // 편지 목록 로드 함수
   const loadLetters = useCallback(async () => {
@@ -119,7 +126,7 @@ export default function InboxPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeTab, isAuthenticated]);
+  }, [activeTab, isAuthenticated, sortOption, filterOptions]);
 
   // 데모 모드 편지 마이그레이션 (한 번만 실행)
   const [hasMigrated, setHasMigrated] = useState(false);
@@ -182,6 +189,39 @@ export default function InboxPage() {
         {/* 헤딩 */}
         <div className="mb-8">
           <h1 className="text-5xl font-bold text-white mb-2">내 보관함</h1>
+        </div>
+
+        {/* 정렬/필터 컨트롤 (P1) */}
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-opacity hover:opacity-90"
+            style={{
+              backgroundColor: "#1A1A1A",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "#FFFFFF",
+            }}
+          >
+            <Icon name="filter" size={16} color="#FFFFFF" />
+            필터
+          </button>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value as SortOption)}
+            className="px-4 py-2 rounded-lg font-medium text-sm transition-opacity hover:opacity-90 focus:outline-none"
+            style={{
+              backgroundColor: "#1A1A1A",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "#FFFFFF",
+            }}
+          >
+            <option value="date-desc">최신순</option>
+            <option value="date-asc">오래된순</option>
+            <option value="tracks-desc">곡 수 많은순</option>
+            <option value="tracks-asc">곡 수 적은순</option>
+            <option value="plays-desc">재생 횟수 많은순</option>
+            <option value="plays-asc">재생 횟수 적은순</option>
+          </select>
         </div>
 
         {/* 탭 */}

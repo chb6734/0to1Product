@@ -9,9 +9,103 @@
  * - 플랫폼 자동 선택 고도화
  */
 
-import { test, expect } from './helpers/msw'
+import { test, expect } from '@playwright/test';
+import { setupServer } from 'msw/node';
+import { http, HttpResponse } from 'msw';
+
+// Mock 사용자 데이터 생성 함수
+function createMockUser(overrides?: {
+  id?: string;
+  email?: string;
+  nickname?: string;
+  profileImage?: string;
+}) {
+  const id = overrides?.id || `user-${Date.now()}`;
+  const email = overrides?.email || `user${Date.now()}@example.com`;
+  const nickname = overrides?.nickname;
+  const profileImage = overrides?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`;
+  const createdAt = new Date().toISOString();
+
+  return {
+    id,
+    email,
+    nickname,
+    profileImage,
+    createdAt,
+  };
+}
+
+// MSW 서버 설정
+const server = setupServer(
+  // 로그인 API Mock
+  http.post('/api/auth/login/google', async () => {
+    const user = createMockUser({
+      email: 'test@example.com',
+      nickname: undefined,
+    });
+    const { nickname, ...userWithoutNickname } = user;
+    const responseUser = nickname === undefined ? userWithoutNickname : user;
+    return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' });
+  }),
+
+  http.post('/api/auth/login/kakao', async () => {
+    const user = createMockUser({
+      email: 'kakao@example.com',
+      nickname: undefined,
+    });
+    const { nickname, ...userWithoutNickname } = user;
+    const responseUser = nickname === undefined ? userWithoutNickname : user;
+    return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' });
+  }),
+
+  http.post('/api/auth/login/apple', async () => {
+    const user = createMockUser({
+      email: 'apple@example.com',
+      nickname: undefined,
+    });
+    const { nickname, ...userWithoutNickname } = user;
+    const responseUser = nickname === undefined ? userWithoutNickname : user;
+    return HttpResponse.json({ user: responseUser, token: 'mock-jwt-token' });
+  }),
+
+  // 프로필 업데이트 API Mock
+  http.put('/api/auth/profile', async ({ request }) => {
+    const body = await request.json() as { 
+      nickname?: string; 
+      profileImage?: string;
+      defaultPlatform?: string | null;
+    };
+    const user = createMockUser({
+      email: 'test@example.com',
+      nickname: body.nickname,
+      profileImage: body.profileImage,
+    });
+    const userWithPlatform = {
+      ...user,
+      defaultPlatform: body.defaultPlatform !== undefined ? body.defaultPlatform : undefined,
+    };
+    return HttpResponse.json({ user: userWithPlatform });
+  }),
+
+  // 로그아웃 API Mock
+  http.post('/api/auth/logout', async () => {
+    return HttpResponse.json({ success: true });
+  }),
+);
 
 test.describe('P1 기능 E2E 테스트', () => {
+  // MSW 서버 시작/종료
+  test.beforeAll(() => {
+    server.listen({ onUnhandledRequest: 'bypass' });
+  });
+
+  test.afterEach(() => {
+    server.resetHandlers();
+  });
+
+  test.afterAll(() => {
+    server.close();
+  });
   /**
    * 테스트: 곡 검색 자동완성
    * 시나리오: 사용자가 검색어를 입력하면 자동완성 제안이 표시됨
@@ -57,8 +151,9 @@ test.describe('P1 기능 E2E 테스트', () => {
     await page.goto('/inbox')
 
     // 정렬 버튼 클릭 (아직 구현되지 않았을 수 있음)
-    const sortButton = page.getByRole('button', { name: /정렬/i }).catch(() => null)
-    if (sortButton) {
+    const sortButton = page.getByRole('button', { name: /정렬/i })
+    const sortButtonCount = await sortButton.count()
+    if (sortButtonCount > 0) {
       await sortButton.click()
 
       // 최신순 선택
@@ -73,8 +168,9 @@ test.describe('P1 기능 E2E 테스트', () => {
     }
 
     // 필터 버튼 클릭 (아직 구현되지 않았을 수 있음)
-    const filterButton = page.getByRole('button', { name: /필터/i }).catch(() => null)
-    if (filterButton) {
+    const filterButton = page.getByRole('button', { name: /필터/i })
+    const filterButtonCount = await filterButton.count()
+    if (filterButtonCount > 0) {
       await filterButton.click()
 
       // 보낸 사람 이름 입력
@@ -132,8 +228,9 @@ test.describe('P1 기능 E2E 테스트', () => {
     await page.reload()
 
     // 복구 모달 확인 (아직 구현되지 않았을 수 있음)
-    const restoreModal = page.getByText(/이전에 작성하던 편지/i).catch(() => null)
-    if (restoreModal) {
+    const restoreModal = page.getByText(/이전에 작성하던 편지/i)
+    const restoreModalCount = await restoreModal.count()
+    if (restoreModalCount > 0) {
       await expect(restoreModal).toBeVisible()
 
       // 복구 버튼 클릭
@@ -141,7 +238,8 @@ test.describe('P1 기능 E2E 테스트', () => {
       await restoreButton.click()
 
       // 데이터 복구 확인
-      await expect(messageInput).toHaveValue('임시 저장 테스트')
+      const messageInputAfter = page.getByPlaceholder(/메시지/i)
+      await expect(messageInputAfter).toHaveValue('임시 저장 테스트')
     } else {
       console.log('임시 저장 복구 기능이 아직 구현되지 않았습니다.')
     }
@@ -175,8 +273,9 @@ test.describe('P1 기능 E2E 테스트', () => {
     await playButton.click()
 
     // 플랫폼 선택 모달 확인
-    const platformModal = page.getByText(/플랫폼 선택/i).catch(() => null)
-    if (platformModal) {
+    const platformModal = page.getByText(/플랫폼 선택/i)
+    const platformModalCount = await platformModal.count()
+    if (platformModalCount > 0) {
       await expect(platformModal).toBeVisible()
 
       // Spotify가 기본 선택되어 있는지 확인 (아직 구현되지 않았을 수 있음)
