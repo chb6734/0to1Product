@@ -1,6 +1,6 @@
 /**
  * 편지 이미지 업로드 기능 테스트
- * 
+ *
  * 목적: 편지 생성 시 이미지 업로드 및 표시 기능 검증
  * 시나리오:
  * - 이미지 파일 선택 및 업로드
@@ -10,73 +10,149 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { renderHook, act } from "@testing-library/react";
 import { useLetter } from "../hooks/useLetter";
+import * as imageUploadUtils from "@/shared/utils/imageUpload";
 
-// useLetter 훅을 직접 테스트하기보다는 컴포넌트 통합 테스트로 진행
-// 여기서는 이미지 업로드 유틸리티 함수를 테스트
+// imageUpload 유틸리티 모킹
+vi.mock("@/shared/utils/imageUpload", () => ({
+  uploadImage: vi.fn(),
+  validateImageFile: vi.fn(),
+  getDefaultLetterImage: vi.fn(() => "data:image/svg+xml;base64,default"),
+}));
 
-/**
- * 이미지 파일을 Base64로 변환하는 유틸리티 함수 테스트
- */
-describe("이미지 업로드 유틸리티", () => {
+describe("useLetter - 이미지 업로드 기능", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   /**
-   * 테스트: 이미지 파일을 Base64로 변환
+   * 테스트: 이미지 설정 기능
    * 시나리오: 사용자가 이미지 파일을 선택함
    * Given: 유효한 이미지 파일이 있음
-   * When: 파일을 Base64로 변환함
-   * Then: Base64 문자열이 반환됨
+   * When: setImage 함수를 호출함
+   * Then: letter.imageUrl이 설정됨
    */
-  it("should convert image file to base64", async () => {
-    // 이미지 파일 생성 (실제 파일 대신 Blob 사용)
-    const imageBlob = new Blob(["fake-image-data"], { type: "image/png" });
-    const file = new File([imageBlob], "test-image.png", { type: "image/png" });
+  it("should set image URL when valid image file is provided", async () => {
+    // Arrange: 테스트 준비
+    const { result } = renderHook(() => useLetter());
+    const mockFile = new File(["test"], "test.png", { type: "image/png" });
+    const mockImageUrl = "data:image/png;base64,test123";
 
-    // FileReader를 사용하여 Base64 변환
-    const reader = new FileReader();
-    const base64Promise = new Promise<string>((resolve, reject) => {
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+    vi.mocked(imageUploadUtils.uploadImage).mockResolvedValue(mockImageUrl);
+
+    // Act: 액션 수행
+    await act(async () => {
+      await result.current.setImage(mockFile, false);
     });
 
-    const base64 = await base64Promise;
-    expect(base64).toContain("data:image/png;base64,");
+    // Assert: 결과 검증
+    expect(result.current.letter.imageUrl).toBe(mockImageUrl);
+    expect(imageUploadUtils.uploadImage).toHaveBeenCalledWith(mockFile, false);
   });
 
   /**
-   * 테스트: 이미지 파일 크기 검증
+   * 테스트: 데모 모드에서 이미지 설정
+   * 시나리오: 사용자가 데모 모드에서 이미지를 선택함
+   * Given: 데모 모드가 활성화되어 있음
+   * When: setImage 함수를 호출함
+   * Then: letter.imageUrl이 Base64로 설정됨
+   */
+  it("should set image URL in demo mode", async () => {
+    // Arrange: 테스트 준비
+    const { result } = renderHook(() => useLetter());
+    const mockFile = new File(["test"], "test.png", { type: "image/png" });
+    const mockImageUrl = "data:image/png;base64,demo123";
+
+    vi.mocked(imageUploadUtils.uploadImage).mockResolvedValue(mockImageUrl);
+
+    // Act: 액션 수행
+    await act(async () => {
+      await result.current.setImage(mockFile, true);
+    });
+
+    // Assert: 결과 검증
+    expect(result.current.letter.imageUrl).toBe(mockImageUrl);
+    expect(imageUploadUtils.uploadImage).toHaveBeenCalledWith(mockFile, true);
+  });
+
+  /**
+   * 테스트: 이미지 삭제 기능
+   * 시나리오: 사용자가 이미지를 삭제함
+   * Given: 편지에 이미지가 설정되어 있음
+   * When: removeImage 함수를 호출함
+   * Then: letter.imageUrl이 undefined가 됨
+   */
+  it("should remove image when removeImage is called", async () => {
+    // Arrange: 테스트 준비
+    const { result } = renderHook(() => useLetter());
+    const mockFile = new File(["test"], "test.png", { type: "image/png" });
+    const mockImageUrl = "data:image/png;base64,test123";
+
+    // 먼저 이미지 설정
+    vi.mocked(imageUploadUtils.uploadImage).mockResolvedValue(mockImageUrl);
+    await act(async () => {
+      await result.current.setImage(mockFile, false);
+    });
+
+    expect(result.current.letter.imageUrl).toBe(mockImageUrl);
+
+    // Act: 이미지 삭제
+    act(() => {
+      result.current.removeImage();
+    });
+
+    // Assert: 결과 검증
+    expect(result.current.letter.imageUrl).toBeUndefined();
+  });
+
+  /**
+   * 테스트: 잘못된 이미지 파일 처리
+   * 시나리오: 사용자가 잘못된 형식의 이미지 파일을 선택함
+   * Given: 유효하지 않은 이미지 파일이 있음
+   * When: setImage 함수를 호출함
+   * Then: 에러가 발생함
+   */
+  it("should throw error when invalid image file is provided", async () => {
+    // Arrange: 테스트 준비
+    const { result } = renderHook(() => useLetter());
+    const mockFile = new File(["test"], "test.txt", { type: "text/plain" });
+    const errorMessage = "JPG, PNG, WebP 형식만 지원됩니다.";
+
+    vi.mocked(imageUploadUtils.uploadImage).mockRejectedValue(
+      new Error(errorMessage)
+    );
+
+    // Act & Assert: 액션 수행 및 에러 검증
+    await expect(
+      act(async () => {
+        await result.current.setImage(mockFile, false);
+      })
+    ).rejects.toThrow(errorMessage);
+  });
+
+  /**
+   * 테스트: 이미지 파일 크기 초과 처리
    * 시나리오: 사용자가 너무 큰 이미지 파일을 선택함
    * Given: 5MB를 초과하는 이미지 파일이 있음
-   * When: 파일 크기를 검증함
+   * When: setImage 함수를 호출함
    * Then: 에러가 발생함
    */
-  it("should validate image file size", () => {
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    const largeBlob = new Blob([new ArrayBuffer(MAX_FILE_SIZE + 1)]);
-    const largeFile = new File([largeBlob], "large-image.png", {
-      type: "image/png",
-    });
+  it("should throw error when image file size exceeds limit", async () => {
+    // Arrange: 테스트 준비
+    const { result } = renderHook(() => useLetter());
+    const mockFile = new File(["test"], "large.png", { type: "image/png" });
+    const errorMessage = "이미지 크기는 5MB 이하여야 합니다.";
 
-    expect(largeFile.size).toBeGreaterThan(MAX_FILE_SIZE);
-  });
+    vi.mocked(imageUploadUtils.uploadImage).mockRejectedValue(
+      new Error(errorMessage)
+    );
 
-  /**
-   * 테스트: 이미지 파일 형식 검증
-   * 시나리오: 사용자가 지원하지 않는 파일 형식을 선택함
-   * Given: JPG, PNG, WebP가 아닌 파일이 있음
-   * When: 파일 형식을 검증함
-   * Then: 에러가 발생함
-   */
-  it("should validate image file type", () => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-    const invalidFile = new File(["data"], "test.txt", { type: "text/plain" });
-
-    expect(allowedTypes.includes(invalidFile.type)).toBe(false);
+    // Act & Assert: 액션 수행 및 에러 검증
+    await expect(
+      act(async () => {
+        await result.current.setImage(mockFile, false);
+      })
+    ).rejects.toThrow(errorMessage);
   });
 });
-

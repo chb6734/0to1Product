@@ -13,6 +13,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { LETTER_ERROR_MESSAGES } from "@/shared/constants/errorMessages";
 import { letterDraftUtils } from "@/shared/utils/letterDraft";
+import { uploadImage } from "@/shared/utils/imageUpload";
 
 interface Track {
   id: string;
@@ -168,6 +169,51 @@ export function useLetter() {
       ),
     }));
   }, []);
+
+  /**
+   * 이미지 설정
+   */
+  const setImage = useCallback(
+    async (file: File, isDemoMode: boolean = false) => {
+      try {
+        setError(null);
+        const imageUrl = await uploadImage(file, isDemoMode);
+        setLetter((prev) => {
+          const newLetter = {
+            ...prev,
+            imageUrl,
+          };
+          // 임시 저장
+          saveDraft(newLetter);
+          return newLetter;
+        });
+      } catch (error) {
+        const imageError =
+          error instanceof Error
+            ? error
+            : new Error("이미지 업로드에 실패했습니다.");
+        setError(imageError);
+        throw imageError;
+      }
+    },
+    [saveDraft]
+  );
+
+  /**
+   * 이미지 제거
+   */
+  const removeImage = useCallback(() => {
+    setError(null);
+    setLetter((prev) => {
+      const newLetter = {
+        ...prev,
+        imageUrl: undefined,
+      };
+      // 임시 저장
+      saveDraft(newLetter);
+      return newLetter;
+    });
+  }, [saveDraft]);
 
   /**
    * 편지 초기화
