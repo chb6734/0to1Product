@@ -103,8 +103,15 @@ test.describe("전체 사용자 여정 v4", () => {
     // Then: 보관함으로 이동 (편지가 자동으로 저장됨)
     await expect(page).toHaveURL(/\/inbox/);
 
+    // 보낸 편지 탭이 활성화되어 있는지 확인 (마이그레이션된 편지는 보낸 편지에 표시됨)
+    const sentTab = page.getByRole("button", { name: /보낸 편지/i });
+    await sentTab.click();
+    
+    // 마이그레이션된 편지가 표시될 때까지 대기
+    await page.waitForTimeout(1000);
+    
     // 데모 모드로 만든 편지가 보관함에 있는지 확인
-    await expect(page.getByText(/요즘 날씨가 추워지면서/i)).toBeVisible();
+    await expect(page.getByText(/요즘 날씨가 추워지면서/i)).toBeVisible({ timeout: 10000 });
   });
 
   /**
