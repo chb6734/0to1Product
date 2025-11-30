@@ -136,6 +136,13 @@ test.describe("데모 모드 플로우", () => {
 
     // 보관함에서 편지 확인
     await expect(page).toHaveURL(/\/inbox/);
-    await expect(page.getByText(/마이그레이션 테스트/i)).toBeVisible();
+    
+    // 보낸 편지 탭이 활성화되어 있는지 확인 (마이그레이션된 편지는 보낸 편지에 표시됨)
+    const sentTab = page.getByRole("button", { name: /보낸 편지/i });
+    await sentTab.click();
+    
+    // 마이그레이션된 편지가 표시될 때까지 대기
+    await page.waitForTimeout(1000);
+    await expect(page.getByText(/마이그레이션 테스트/i)).toBeVisible({ timeout: 10000 });
   });
 });

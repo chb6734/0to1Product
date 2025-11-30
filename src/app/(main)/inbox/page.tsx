@@ -215,6 +215,7 @@ export default function InboxPage() {
             body: JSON.stringify({
               tracks: data.tracks,
               message: data.message,
+              imageUrl: data.imageUrl,
             }),
           });
 
@@ -228,6 +229,8 @@ export default function InboxPage() {
 
         setHasMigrated(true);
         // 마이그레이션 성공 후 편지 목록 다시 로드
+        // API 응답이 반영될 시간을 주기 위해 약간의 지연 추가
+        await new Promise((resolve) => setTimeout(resolve, 300));
         await loadLetters();
       } catch (error) {
         console.error("데모 모드 편지 마이그레이션 실패:", error);
